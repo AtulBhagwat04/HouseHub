@@ -18,24 +18,6 @@ Three decisions shape the whole codebase:
 
 ---
 
-## Contents
-
-- [Features](#features)
-- [Tech stack](#tech-stack)
-- [Quick start](#quick-start)
-- [Demo data](#demo-data)
-- [Repository layout](#repository-layout)
-- [How it works](#how-it-works)
-- [Roles and permissions](#roles-and-permissions)
-- [Environment variables](#environment-variables)
-- [Scripts](#scripts)
-- [Testing](#testing)
-- [API reference](#api-reference)
-- [Deployment](#deployment)
-- [Not in this release](#not-in-this-release)
-
----
-
 ## Features
 
 - **Accounts** — register, sign in, JWT sessions, profile editing, change password, forgot/reset
@@ -168,23 +150,5 @@ gate privileged actions.
 
 \* An owner with other members must transfer ownership before leaving; the last member out deletes the
 house. Every rule here is exercised in `server/tests/security.test.js`.
-
----
-
-
-## Scripts
-
-Run from the repository root:
-
-| Command              | What it does                                                   |
-| -------------------- | -------------------------------------------------------------- |
-| `npm run dev`        | API + web app together                                         |
-| `npm run dev:server` | Just the API (nodemon)                                         |
-| `npm run dev:client` | Just the web app (vite)                                        |
-| `npm run build`      | Production build of the SPA into `client/dist`                 |
-| `npm start`          | Start the API without nodemon (production mode)                |
-| `npm test`           | The full API test suite                                        |
-| `npm run seed`       | Load the demo house                                            |
-| `npm run smoke`      | End-to-end journey against a throwaway database over real HTTP |
 
 ---
