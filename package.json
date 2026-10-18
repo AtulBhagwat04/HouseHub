@@ -1,0 +1,24 @@
+{
+  "name": "househub",
+  "private": true,
+  "version": "1.0.0",
+  "description": "HOUSEHUB - expense splitting, settlements and chores for shared houses",
+  "type": "module",
+  "engines": {
+    "node": ">=18.17"
+  },
+  "scripts": {
+    "postinstall": "npm --prefix server install --no-audit --no-fund && npm --prefix client install --no-audit --no-fund",
+    "dev": "concurrently --names api,web --prefix-colors blue,green --kill-others-on-fail \"npm:dev:server\" \"npm:dev:client\"",
+    "dev:server": "npm --prefix server run dev",
+    "dev:client": "npm --prefix client run dev",
+    "build": "npm --prefix client run build",
+    "start": "npm --prefix server start",
+    "test": "npm --prefix server test",
+    "seed": "npm --prefix server run seed",
+    "smoke": "npm --prefix server run smoke"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1"
+  }
+}

@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build output
+dist/
+dist-ssr/
+build/
+client/dist/
+
+# Environment - never commit real secrets.
+.env
+.env.*
+!.env.example
+
+# Test output
+coverage/
+server/tests/**/__snapshots__/*.snap.new
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Editors and OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+*.swo
+
+# Vite / tooling caches
+.vite/
+.eslintcache
+*.tsbuildinfo
+
+# Local database dumps
+*.gz
+dump/

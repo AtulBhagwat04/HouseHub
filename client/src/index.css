@@ -1,0 +1,145 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * Design tokens.
+ *
+ * Values are raw RGB channels (not hex) so Tailwind can compose them with
+ * opacity modifiers - `bg-primary/10` works because of this format.
+ */
+@layer base {
+  :root {
+    --c-background: 246 247 251;
+    --c-surface: 255 255 255;
+    --c-surface-muted: 241 245 249;
+    --c-surface-raised: 255 255 255;
+    --c-border: 226 232 240;
+    --c-foreground: 15 23 42;
+    --c-muted: 100 116 139;
+
+    --c-primary: 79 70 229;
+    --c-primary-soft: 238 242 255;
+    --c-primary-fg: 255 255 255;
+    --c-secondary: 124 58 237;
+    --c-secondary-soft: 245 243 255;
+
+    --c-success: 16 185 129;
+    --c-success-soft: 236 253 245;
+    --c-warning: 245 158 11;
+    --c-warning-soft: 255 251 235;
+    --c-error: 220 38 38;
+    --c-error-soft: 254 242 242;
+
+    --c-gold: 202 138 4;
+
+    color-scheme: light;
+  }
+
+  .dark {
+    --c-background: 8 10 18;
+    --c-surface: 17 21 32;
+    --c-surface-muted: 25 30 44;
+    --c-surface-raised: 24 29 42;
+    --c-border: 38 44 60;
+    --c-foreground: 236 241 248;
+    --c-muted: 148 163 184;
+
+    --c-primary: 129 132 250;
+    --c-primary-soft: 39 38 78;
+    --c-primary-fg: 17 20 34;
+    --c-secondary: 167 139 250;
+    --c-secondary-soft: 51 42 88;
+
+    --c-success: 52 211 153;
+    --c-success-soft: 17 51 41;
+    --c-warning: 251 191 36;
+    --c-warning-soft: 60 44 12;
+    --c-error: 248 113 113;
+    --c-error-soft: 62 24 24;
+
+    --c-gold: 250 204 21;
+
+    color-scheme: dark;
+  }
+
+  * {
+    border-color: rgb(var(--c-border));
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04';
+  }
+
+  /** Consistent, visible focus for keyboard users on every interactive element. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary/60 ring-offset-2 ring-offset-background;
+  }
+
+  ::selection {
+    @apply bg-primary/20;
+  }
+
+  /* Tabular figures everywhere money and XP are shown. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Slim scrollbars in the sidebar and horizontal filter rows. */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--c-border)) transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    height: 6px;
+    width: 6px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-border;
+  }
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-xl border border-border bg-surface shadow-card;
+  }
+
+  .input-base {
+    @apply w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground
+      placeholder:text-muted/70 transition
+      focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/25
+      disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  /* The shimmer used by every loading skeleton. */
+  .skeleton {
+    @apply relative overflow-hidden rounded bg-surface-muted;
+  }
+  .skeleton::after {
+    content: '';
+    @apply absolute inset-0 -translate-x-full;
+    background-image: linear-gradient(90deg, transparent, rgb(var(--c-border) / 0.55), transparent);
+    animation: shimmer 1.6s infinite;
+  }
+}
