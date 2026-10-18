@@ -1,6 +1,12 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
+
+// Self-hosted variable fonts. Bundled rather than loaded from a CDN so the app
+// has no third-party request on first paint and works offline in development.
+import '@fontsource-variable/inter';
+import '@fontsource-variable/plus-jakarta-sans';
+
 import App from './App';
 import './index.css';
 

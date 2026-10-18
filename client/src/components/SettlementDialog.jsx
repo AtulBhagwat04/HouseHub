@@ -207,7 +207,7 @@ export default function SettlementDialog({
             onChange={update('note')}
           />
 
-          <div className="flex gap-2.5 rounded-xl border border-border bg-surface-muted/60 p-3 text-xs text-muted">
+          <div className="flex gap-2.5 rounded-xl border border-primary/20 bg-primary/[0.06] p-3 text-xs text-muted">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
             <p>
               Balances only change once{' '}

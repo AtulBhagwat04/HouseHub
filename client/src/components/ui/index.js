@@ -22,6 +22,7 @@ export { default as EmptyState } from './EmptyState';
 export { default as Modal } from './Modal';
 export { default as ConfirmDialog } from './ConfirmDialog';
 export { default as Dropdown } from './Dropdown';
+export { default as Tooltip } from './Tooltip';
 export { default as Tabs } from './Tabs';
 export { default as Pagination } from './Pagination';
 

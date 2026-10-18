@@ -7,58 +7,74 @@
  *
  * Values are raw RGB channels (not hex) so Tailwind can compose them with
  * opacity modifiers - `bg-primary/10` works because of this format.
+ *
+ * Dark is the primary theme and gets the tuned values; light is a genuine
+ * counterpart rather than an afterthought, because half the app is money and
+ * money reads better on a light background in daylight.
  */
 @layer base {
   :root {
-    --c-background: 246 247 251;
+    --c-background: 250 250 253;
     --c-surface: 255 255 255;
-    --c-surface-muted: 241 245 249;
+    --c-surface-muted: 245 246 250;
     --c-surface-raised: 255 255 255;
-    --c-border: 226 232 240;
-    --c-foreground: 15 23 42;
-    --c-muted: 100 116 139;
+    --c-border: 226 230 238;
+    --c-foreground: 16 19 28;
+    --c-muted: 108 116 136;
 
     --c-primary: 79 70 229;
-    --c-primary-soft: 238 242 255;
+    --c-primary-soft: 238 240 255;
     --c-primary-fg: 255 255 255;
     --c-secondary: 124 58 237;
-    --c-secondary-soft: 245 243 255;
+    --c-secondary-soft: 245 242 255;
+    --c-accent: 8 145 178;
 
     --c-success: 16 185 129;
     --c-success-soft: 236 253 245;
-    --c-warning: 245 158 11;
-    --c-warning-soft: 255 251 235;
+    --c-warning: 217 119 6;
+    --c-warning-soft: 255 248 235;
     --c-error: 220 38 38;
     --c-error-soft: 254 242 242;
 
-    --c-gold: 202 138 4;
+    --c-gold: 180 120 8;
+    --c-gold-soft: 255 249 230;
+
+    /* Alpha of the glass layer over the page background. */
+    --glass-alpha: 0.72;
+    --glass-highlight: 255 255 255 / 0.7;
 
     color-scheme: light;
   }
 
   .dark {
-    --c-background: 8 10 18;
-    --c-surface: 17 21 32;
-    --c-surface-muted: 25 30 44;
-    --c-surface-raised: 24 29 42;
-    --c-border: 38 44 60;
-    --c-foreground: 236 241 248;
-    --c-muted: 148 163 184;
+    --c-background: 7 8 14;
+    --c-surface: 17 19 28;
+    --c-surface-muted: 23 26 37;
+    --c-surface-raised: 21 24 35;
+    --c-border: 40 44 58;
+    --c-foreground: 238 241 249;
+    --c-muted: 146 153 176;
 
-    --c-primary: 129 132 250;
-    --c-primary-soft: 39 38 78;
-    --c-primary-fg: 17 20 34;
-    --c-secondary: 167 139 250;
-    --c-secondary-soft: 51 42 88;
+    --c-primary: 139 148 251;
+    --c-primary-soft: 42 43 84;
+    --c-primary-fg: 13 15 24;
+    --c-secondary: 192 132 252;
+    --c-secondary-soft: 55 42 92;
+    --c-accent: 34 211 238;
 
     --c-success: 52 211 153;
-    --c-success-soft: 17 51 41;
+    --c-success-soft: 15 46 38;
     --c-warning: 251 191 36;
-    --c-warning-soft: 60 44 12;
+    --c-warning-soft: 56 42 12;
     --c-error: 248 113 113;
-    --c-error-soft: 62 24 24;
+    --c-error-soft: 58 24 26;
 
-    --c-gold: 250 204 21;
+    --c-gold: 251 191 36;
+    --c-gold-soft: 56 44 12;
+
+    /* Darker glass reads better against a near-black page. */
+    --glass-alpha: 0.6;
+    --glass-highlight: 255 255 255 / 0.06;
 
     color-scheme: dark;
   }
@@ -69,11 +85,20 @@
 
   html {
     -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
   }
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-feature-settings: 'cv02', 'cv03', 'cv04';
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display tracking-tight;
   }
 
   /** Consistent, visible focus for keyboard users on every interactive element. */
@@ -82,7 +107,7 @@
   }
 
   ::selection {
-    @apply bg-primary/20;
+    @apply bg-primary/25;
   }
 
   /* Tabular figures everywhere money and XP are shown. */
@@ -90,17 +115,28 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* Slim scrollbars in the sidebar and horizontal filter rows. */
+  /**
+   * Slim scrollbars.
+   *
+   * Styled explicitly rather than left to the platform because the default
+   * Windows scrollbar in a dark page is a bright grey stripe that ruins the look.
+   */
   .scrollbar-thin {
     scrollbar-width: thin;
     scrollbar-color: rgb(var(--c-border)) transparent;
   }
   .scrollbar-thin::-webkit-scrollbar {
-    height: 6px;
-    width: 6px;
+    height: 8px;
+    width: 8px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
   }
   .scrollbar-thin::-webkit-scrollbar-thumb {
     @apply rounded-full bg-border;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(var(--c-muted) / 0.5);
   }
   .scrollbar-none {
     scrollbar-width: none;
@@ -121,25 +157,120 @@
 }
 
 @layer components {
+  /**
+   * The default panel: a translucent surface over the page background plus a
+   * hairline highlight along the top edge. This is what makes a stack of cards
+   * read as glass instead of as flat rectangles.
+   */
   .card {
-    @apply rounded-xl border border-border bg-surface shadow-card;
+    @apply relative rounded-2xl border border-border shadow-card;
+    background-color: rgb(var(--c-surface) / var(--glass-alpha));
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+  }
+  .card::before {
+    content: '';
+    @apply pointer-events-none absolute inset-x-0 top-0 h-px rounded-t-2xl;
+    background: linear-gradient(90deg, transparent, rgb(var(--glass-highlight)), transparent);
+  }
+
+  /** Opaque variant, for nested panels where stacking blur looks muddy. */
+  .card-solid {
+    @apply rounded-2xl border border-border bg-surface shadow-card;
   }
 
   .input-base {
-    @apply w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground
-      placeholder:text-muted/70 transition
-      focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/25
+    @apply w-full rounded-xl border border-border bg-surface-muted/50 px-3 py-2.5 text-sm text-foreground
+      placeholder:text-muted/60 transition
+      hover:border-primary/40
+      focus:border-primary focus:bg-surface focus:outline-none focus:ring-4 focus:ring-primary/15
       disabled:cursor-not-allowed disabled:opacity-60;
   }
 
   /* The shimmer used by every loading skeleton. */
   .skeleton {
-    @apply relative overflow-hidden rounded bg-surface-muted;
+    @apply relative overflow-hidden rounded-lg bg-surface-muted;
   }
   .skeleton::after {
     content: '';
     @apply absolute inset-0 -translate-x-full;
-    background-image: linear-gradient(90deg, transparent, rgb(var(--c-border) / 0.55), transparent);
+    background-image: linear-gradient(90deg, transparent, rgb(var(--c-muted) / 0.14), transparent);
     animation: shimmer 1.6s infinite;
+  }
+
+  /**
+   * Primary button fill.
+   *
+   * The gradient stops are literal palette values rather than theme tokens on
+   * purpose: the accent is indigo-to-violet in both themes, and pinning the stops
+   * is the only way to guarantee white text keeps a readable contrast against
+   * every point of the gradient.
+   */
+  .bg-brand-gradient {
+    background-image: linear-gradient(135deg, #4f46e5 0%, #7c3aed 55%, #9333ea 100%);
+  }
+
+  /** Gradient text, for headline accents. */
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(120deg, rgb(var(--c-primary)) 0%, rgb(var(--c-secondary)) 60%, rgb(var(--c-accent)) 100%);
+  }
+
+  .aurora-blob {
+    @apply pointer-events-none absolute rounded-full blur-3xl;
+  }
+
+  /**
+   * Cascading entrance for a page's top-level blocks.
+   *
+   * Applied to a page root (`space-y-5 page-stagger`) so the cards arrive in
+   * sequence instead of all at once. Capped at eight steps and driven purely by
+   * CSS, so a long list further down the page is unaffected.
+   */
+  .page-stagger > * {
+    animation: slide-up 340ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .page-stagger > *:nth-child(1) {
+    animation-delay: 0ms;
+  }
+  .page-stagger > *:nth-child(2) {
+    animation-delay: 45ms;
+  }
+  .page-stagger > *:nth-child(3) {
+    animation-delay: 90ms;
+  }
+  .page-stagger > *:nth-child(4) {
+    animation-delay: 135ms;
+  }
+  .page-stagger > *:nth-child(5) {
+    animation-delay: 180ms;
+  }
+  .page-stagger > *:nth-child(6) {
+    animation-delay: 225ms;
+  }
+  .page-stagger > *:nth-child(7) {
+    animation-delay: 270ms;
+  }
+  .page-stagger > *:nth-child(n + 8) {
+    animation-delay: 315ms;
+  }
+
+  /** Faint dot grid, used behind hero sections. */
+  .dot-grid {
+    background-image: radial-gradient(rgb(var(--c-muted) / 0.18) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .text-pretty {
+    text-wrap: pretty;
+  }
+  /** Fades the bottom of a scrollable region instead of cutting it dead. */
+  .mask-fade-b {
+    mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
   }
 }

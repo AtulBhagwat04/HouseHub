@@ -41,18 +41,20 @@ export default function ConfirmDialog({
         </>
       }
     >
-      <div className="flex gap-3">
+      <div className="flex gap-3.5">
         <span
           className={cn(
-            'flex h-10 w-10 shrink-0 items-center justify-center rounded-full',
-            isDanger ? 'bg-error-soft text-error' : 'bg-warning-soft text-warning',
+            'flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border',
+            isDanger
+              ? 'border-error/25 bg-error-soft text-error'
+              : 'border-warning/30 bg-warning-soft text-warning',
           )}
         >
           <AlertTriangle className="h-5 w-5" aria-hidden="true" />
         </span>
 
-        <div className="min-w-0 space-y-1 pt-1">
-          <h2 className="text-base font-semibold text-foreground">{title}</h2>
+        <div className="min-w-0 space-y-1 pt-0.5">
+          <h2 className="font-display text-base font-semibold text-foreground">{title}</h2>
           {description && <p className="text-sm text-muted">{description}</p>}
         </div>
       </div>

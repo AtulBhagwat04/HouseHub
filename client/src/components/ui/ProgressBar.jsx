@@ -1,12 +1,18 @@
 import { cn } from '@/lib/cn';
 
+/**
+ * Gradient fills per tone.
+ *
+ * `primary` reuses the shared `.bg-brand-gradient` class so the level bar, the
+ * primary button and the hero accent are literally the same gradient.
+ */
 const TONES = {
-  primary: 'bg-primary',
-  success: 'bg-success',
-  warning: 'bg-warning',
-  error: 'bg-error',
-  gold: 'bg-gold',
-  secondary: 'bg-secondary',
+  primary: 'bg-brand-gradient',
+  success: 'bg-gradient-to-r from-emerald-500 to-teal-400',
+  warning: 'bg-gradient-to-r from-amber-500 to-orange-400',
+  error: 'bg-gradient-to-r from-red-500 to-rose-400',
+  gold: 'bg-gradient-to-r from-amber-400 to-yellow-300',
+  secondary: 'bg-gradient-to-r from-violet-500 to-fuchsia-400',
 };
 
 const SIZES = {
@@ -53,7 +59,10 @@ export default function ProgressBar({
         className={cn('w-full overflow-hidden rounded-full bg-surface-muted', SIZES[size], trackClassName)}
       >
         <div
-          className={cn('h-full rounded-full transition-[width] duration-500 ease-out', TONES[tone] || TONES.primary)}
+          className={cn(
+            'h-full rounded-full shadow-[0_0_12px_-2px_currentColor] transition-[width] duration-700 ease-out',
+            TONES[tone] || TONES.primary,
+          )}
           style={{ width: `${percent}%` }}
         />
       </div>

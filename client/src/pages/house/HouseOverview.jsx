@@ -84,7 +84,7 @@ export default function HouseOverview() {
   const categories = analytics?.categories || [];
 
   return (
-    <div className="space-y-5">
+    <div className="page-stagger space-y-5">
       <PageHeader
         breadcrumbs={[{ label: 'Dashboard', to: '/dashboard' }, { label: 'House' }]}
         title={house?.name || sessionHouse?.name || 'House'}
@@ -118,23 +118,22 @@ export default function HouseOverview() {
       ) : !house ? null : (
         <>
           {justCreated && !welcomeDismissed && (
-            <Card className="border-primary/30 bg-primary-soft/60">
+            <Card className="animate-fade-in border-primary/30 bg-primary-soft/60">
               <div className="flex items-start gap-3">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-soft text-primary">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary-soft text-primary">
                   <Sparkles className="h-5 w-5" aria-hidden="true" />
                 </span>
 
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold text-foreground">&ldquo;{house.name}&rdquo; is ready</p>
-                  <p className="mt-0.5 text-sm text-muted">
-                    Share the invite link below so your housemates can join. Balances and the chore board only
-                    start to mean anything once someone else is in.
+                  <p className="mt-0.5 text-sm text-muted text-pretty">
+                    Share the invite link below so your housemates can join.
                   </p>
                 </div>
 
                 <Button
                   variant="ghost"
-                  size="icon-sm"
+                  size="icon"
                   onClick={() => setWelcomeDismissed(true)}
                   aria-label="Dismiss the welcome message"
                 >
@@ -145,15 +144,20 @@ export default function HouseOverview() {
           )}
 
           {/* Hero ---------------------------------------------------------- */}
-          <Card>
-            <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-lg font-semibold tracking-tight text-foreground">{house.name}</h2>
+          <Card className="overflow-hidden">
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute -right-10 -top-16 h-40 w-40 rounded-full bg-primary/20 blur-3xl"
+            />
+
+            <div className="relative flex flex-wrap items-center gap-2">
+              <h2 className="font-display text-xl font-semibold tracking-tight text-foreground">{house.name}</h2>
               <Badge tone={ROLE_TONES[viewerRole] || 'neutral'}>
                 {ROLE_LABELS[viewerRole] || 'Member'}
               </Badge>
             </div>
 
-            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm text-muted">
+            <div className="relative mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted">
               {house.location && (
                 <span className="inline-flex items-center gap-1.5">
                   <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
@@ -170,7 +174,9 @@ export default function HouseOverview() {
               </span>
             </div>
 
-            {house.description && <p className="mt-3 text-sm text-foreground/90">{house.description}</p>}
+            {house.description && (
+              <p className="relative mt-3 max-w-2xl text-sm text-foreground/90 text-pretty">{house.description}</p>
+            )}
           </Card>
 
           <div className="grid gap-5 lg:grid-cols-3">
@@ -284,7 +290,7 @@ export default function HouseOverview() {
                               <CategoryIcon category={entry.category} size="sm" />
 
                               <div className="min-w-0 flex-1">
-                                <div className="flex items-center justify-between gap-2">
+                                <div className="flex items-baseline justify-between gap-2">
                                   <span className="truncate text-sm font-medium text-foreground">
                                     {categoryMeta(entry.category).label}
                                   </span>
@@ -294,12 +300,13 @@ export default function HouseOverview() {
                                 </div>
 
                                 <ProgressBar value={entry.percentage / 100} size="sm" className="mt-1.5" />
+
+                                <div className="mt-1 flex items-center justify-between gap-2 text-2xs text-muted">
+                                  <span className="tabular">{entry.percentage}%</span>
+                                  <span className="truncate">{pluralise(entry.count, 'expense')}</span>
+                                </div>
                               </div>
                             </div>
-
-                            <p className="mt-1 pl-10 text-2xs text-muted">
-                              {entry.percentage}% &middot; {pluralise(entry.count, 'expense')}
-                            </p>
                           </li>
                         ))}
                       </ul>
@@ -318,7 +325,6 @@ export default function HouseOverview() {
                 allowInvites={house.settings?.allowInvites !== false}
                 canManage={viewerIsManager}
               />
-
 
               <SectionCard
                 title="Housemates"
@@ -349,7 +355,7 @@ export default function HouseOverview() {
                         <li key={member._id}>
                           <Link
                             to="/house/members"
-                            className="flex items-center gap-3 py-2.5 transition hover:opacity-80"
+                            className="group flex items-center gap-3 py-3 transition hover:opacity-80"
                           >
                             <Avatar src={member.avatarUrl} name={member.name} size="sm" />
 
@@ -358,12 +364,12 @@ export default function HouseOverview() {
                                 {member.name}
                                 {member._id === user?._id && <span className="ml-1.5 text-xs text-muted">(you)</span>}
                               </p>
-                              <p className="text-2xs text-muted">
-                                Lv {member.level} &middot; {ROLE_LABELS[member.role] || 'Member'}
+                              <p className="truncate text-2xs text-muted">
+                                {ROLE_LABELS[member.role] || 'Member'}
                               </p>
                             </div>
 
-                            <XpBadge xp={member.xp} level={member.level} variant="chip" />
+                            <XpBadge xp={member.xp} level={member.level} variant="chip" className="shrink-0" />
                           </Link>
                         </li>
                       ))}
@@ -382,11 +388,11 @@ export default function HouseOverview() {
                   ) : null
                 }
               >
-                <ul className="space-y-2.5">
+                <ul className="divide-y divide-border">
                   <PreferenceRow label="Invites" enabled={house.settings?.allowInvites !== false} />
                   <PreferenceRow label="Notifications" enabled={house.settings?.notificationsEnabled !== false} />
-                  <li className="flex items-center justify-between gap-3">
-                    <span className="text-sm text-muted">Weekly chore goal</span>
+                  <li className="flex items-center justify-between gap-3 py-2.5">
+                    <span className="text-sm text-foreground">Weekly chore goal</span>
                     <span className="tabular text-sm font-medium text-foreground">
                       {house.settings?.weeklyChoreGoal ?? '—'}
                     </span>
@@ -404,9 +410,11 @@ export default function HouseOverview() {
 /** One boolean house setting, shown as a tick or a cross rather than "true"/"false". */
 function PreferenceRow({ label, enabled }) {
   return (
-    <li className="flex items-center justify-between gap-3">
-      <span className="text-sm text-muted">{label}</span>
-      <span className={`inline-flex items-center gap-1.5 text-sm font-medium ${enabled ? 'text-success' : 'text-muted'}`}>
+    <li className="flex items-center justify-between gap-3 py-2.5">
+      <span className="text-sm text-foreground">{label}</span>
+      <span
+        className={`inline-flex items-center gap-1.5 text-sm font-medium ${enabled ? 'text-success' : 'text-muted'}`}
+      >
         {enabled ? <Check className="h-4 w-4" aria-hidden="true" /> : <X className="h-4 w-4" aria-hidden="true" />}
         {enabled ? 'On' : 'Off'}
       </span>

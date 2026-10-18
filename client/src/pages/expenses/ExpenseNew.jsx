@@ -45,7 +45,7 @@ export default function ExpenseNew() {
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 page-stagger">
       <PageHeader
         title="Add expense"
         description="Log a shared bill. HOUSEHUB splits it and keeps everyone's balance honest."

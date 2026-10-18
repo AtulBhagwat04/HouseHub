@@ -1,7 +1,7 @@
-import { useCallback, useState } from 'react';
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/cn';
-import { useClickOutside } from '@/hooks';
 
 /**
  * Click-to-open menu, used for row actions and the account menu.
@@ -9,6 +9,11 @@ import { useClickOutside } from '@/hooks';
  * Items are either `{ label, icon, onClick }`, `{ label, icon, to }` for a router
  * link, or `{ separator: true }`. Items marked `danger` render in red and the
  * whole menu auto-closes after a click.
+ *
+ * Backed by Radix DropdownMenu so roving focus, type-ahead, Escape and
+ * click-outside are handled by the primitive. Animation uses Radix's own
+ * `data-state` attribute, which means there is no exit-animation bookkeeping to
+ * get wrong.
  */
 export default function Dropdown({
   trigger,
@@ -21,56 +26,34 @@ export default function Dropdown({
 }) {
   const [open, setOpen] = useState(false);
 
-  const close = useCallback(() => setOpen(false), []);
-  const ref = useClickOutside(close);
-
-  const alignment = {
-    left: 'left-0',
-    right: 'right-0',
-  }[align] || 'right-0';
-
   return (
-    <div ref={ref} className={cn('relative', className)}>
-      <div
-        onClick={() => {
-          if (!disabled) setOpen((value) => !value);
-        }}
-        role="button"
-        tabIndex={disabled ? -1 : 0}
-        aria-haspopup="menu"
-        aria-expanded={open}
-        aria-disabled={disabled || undefined}
-        onKeyDown={(event) => {
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
-            if (!disabled) setOpen((value) => !value);
-          }
-        }}
-        className={cn('inline-flex cursor-pointer', disabled && 'cursor-not-allowed opacity-50')}
-      >
+    <DropdownMenu.Root open={open} onOpenChange={setOpen}>
+      <DropdownMenu.Trigger asChild disabled={disabled} className={className}>
         {typeof trigger === 'function' ? trigger({ open }) : trigger}
-      </div>
+      </DropdownMenu.Trigger>
 
-      {open && (
-        <div
-          role="menu"
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content
+          align={align === 'left' ? 'start' : 'end'}
+          sideOffset={6}
+          collisionPadding={8}
           className={cn(
-            'absolute z-40 mt-1.5 origin-top animate-slide-up overflow-hidden rounded-xl border border-border bg-surface p-1 shadow-pop',
-            alignment,
+            'z-50 origin-top animate-pop-in overflow-hidden rounded-2xl border border-border p-1.5 shadow-pop',
+            'bg-surface-raised/95 backdrop-blur-xl',
             width,
             panelClassName,
           )}
         >
           {items.map((item, index) => {
             if (item.separator) {
-              return <div key={`sep-${index}`} className="my-1 h-px bg-border" />;
+              return <DropdownMenu.Separator key={`sep-${index}`} className="my-1.5 h-px bg-border" />;
             }
 
             const itemClasses = cn(
-              'flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm transition',
+              'flex w-full cursor-pointer select-none items-center gap-2.5 rounded-xl px-2.5 py-2 text-left text-sm outline-none transition',
               item.danger
-                ? 'text-error hover:bg-error-soft'
-                : 'text-foreground hover:bg-surface-muted',
+                ? 'text-error data-[highlighted]:bg-error-soft'
+                : 'text-foreground data-[highlighted]:bg-surface-muted',
               item.disabled && 'pointer-events-none opacity-50',
             );
 
@@ -84,30 +67,27 @@ export default function Dropdown({
 
             if (item.to) {
               return (
-                <Link key={item.label} to={item.to} className={itemClasses} role="menuitem" onClick={close}>
-                  {content}
-                </Link>
+                <DropdownMenu.Item key={item.label} asChild disabled={item.disabled}>
+                  <Link to={item.to} className={itemClasses}>
+                    {content}
+                  </Link>
+                </DropdownMenu.Item>
               );
             }
 
             return (
-              <button
+              <DropdownMenu.Item
                 key={item.label}
-                type="button"
-                role="menuitem"
                 disabled={item.disabled}
                 className={itemClasses}
-                onClick={() => {
-                  close();
-                  item.onClick?.();
-                }}
+                onSelect={() => item.onClick?.()}
               >
                 {content}
-              </button>
+              </DropdownMenu.Item>
             );
           })}
-        </div>
-      )}
-    </div>
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
+    </DropdownMenu.Root>
   );
 }

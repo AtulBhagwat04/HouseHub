@@ -52,7 +52,7 @@ export default function Pagination({ meta, onChange, className, itemLabel = 'ite
               size="icon-sm"
               onClick={() => go(entry)}
               aria-current={entry === page ? 'page' : undefined}
-              className="tabular"
+              className={cn('tabular', entry !== page && 'text-muted')}
             >
               {entry}
             </Button>

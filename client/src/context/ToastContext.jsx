@@ -1,84 +1,53 @@
-import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
-import { AlertTriangle, CheckCircle2, Info, X, XCircle } from 'lucide-react';
-import { cn } from '@/lib/cn';
+import { createContext, useCallback, useContext, useMemo } from 'react';
+import { Toaster, toast } from 'sonner';
+import { useTheme } from '@/context/ThemeContext';
 
 const ToastContext = createContext(null);
 
-const VARIANTS = {
-  success: {
-    icon: CheckCircle2,
-    className: 'border-success/30 bg-success-soft text-foreground',
-    iconClassName: 'text-success',
-    duration: 4000,
-  },
-  error: {
-    icon: XCircle,
-    className: 'border-error/30 bg-error-soft text-foreground',
-    iconClassName: 'text-error',
-    duration: 7000,
-  },
-  warning: {
-    icon: AlertTriangle,
-    className: 'border-warning/30 bg-warning-soft text-foreground',
-    iconClassName: 'text-warning',
-    duration: 5500,
-  },
-  info: {
-    icon: Info,
-    className: 'border-primary/25 bg-primary-soft text-foreground',
-    iconClassName: 'text-primary',
-    duration: 4500,
-  },
+const DURATIONS = {
+  success: 4000,
+  error: 7000,
+  warning: 5500,
+  info: 4500,
 };
 
 /**
- * App-wide toasts.
+ * App-wide toasts, backed by Sonner.
+ *
+ * The public API is deliberately unchanged from the previous hand-rolled
+ * implementation (`success` / `error` / `warning` / `info` / `fromError` /
+ * `push` / `dismiss`), so no page had to be touched when the rendering moved to
+ * Sonner - only this file knows how a toast is drawn.
  *
  * Every failed request surfaces here with the server's own `message`, which is
  * already written for humans - so users never see a raw stack trace or a bare
  * "Request failed with status code 500".
  */
 export function ToastProvider({ children }) {
-  const [toasts, setToasts] = useState([]);
-  const timers = useRef(new Map());
-  const counter = useRef(0);
+  const { resolved } = useTheme();
 
-  const dismiss = useCallback((id) => {
-    setToasts((current) => current.filter((toast) => toast.id !== id));
-    const timer = timers.current.get(id);
-    if (timer) {
-      clearTimeout(timer);
-      timers.current.delete(id);
-    }
+  const push = useCallback((type, message, { title, duration } = {}) => {
+    if (!message) return null;
+
+    // Sonner treats the main string as the bold line and `description` as the
+    // muted second line, which maps onto our optional `title` + `message`.
+    const text = title || message;
+
+    // Deriving the id from the content collapses an identical repeat into the
+    // existing toast instead of stacking a duplicate.
+    const id = `${type}:${text}:${title ? message : ''}`;
+
+    const options = {
+      id,
+      duration: duration ?? DURATIONS[type] ?? DURATIONS.info,
+      description: title ? message : undefined,
+    };
+
+    const emit = typeof toast[type] === 'function' ? toast[type] : toast.info;
+    return emit(text, options);
   }, []);
 
-  const push = useCallback(
-    (type, message, { title, duration } = {}) => {
-      if (!message) return null;
-
-      counter.current += 1;
-      const id = `toast-${counter.current}`;
-      const variant = VARIANTS[type] || VARIANTS.info;
-
-      setToasts((current) => {
-        // Collapse an identical repeat instead of stacking duplicates.
-        const existing = current.find((toast) => toast.message === message && toast.type === type);
-        if (existing) return current;
-        return [...current.slice(-3), { id, type, title, message }];
-      });
-
-      const timeout = duration ?? variant.duration;
-      if (timeout > 0) {
-        timers.current.set(
-          id,
-          setTimeout(() => dismiss(id), timeout),
-        );
-      }
-
-      return id;
-    },
-    [dismiss],
-  );
+  const dismiss = useCallback((id) => toast.dismiss(id), []);
 
   const value = useMemo(
     () => ({
@@ -89,8 +58,7 @@ export function ToastProvider({ children }) {
       warning: (message, options) => push('warning', message, options),
       info: (message, options) => push('info', message, options),
       /** Convenience for catch blocks. */
-      fromError: (error, fallback = 'Something went wrong') =>
-        push('error', error?.message || fallback),
+      fromError: (error, fallback = 'Something went wrong') => push('error', error?.message || fallback),
     }),
     [push, dismiss],
   );
@@ -99,44 +67,25 @@ export function ToastProvider({ children }) {
     <ToastContext.Provider value={value}>
       {children}
 
-      {/* Region is always mounted so screen readers announce new toasts. */}
-      <div
-        aria-live="polite"
-        aria-atomic="false"
-        className="pointer-events-none fixed inset-x-0 top-3 z-[60] flex flex-col items-center gap-2 px-3 sm:inset-x-auto sm:bottom-4 sm:right-4 sm:top-auto sm:items-end sm:px-0"
-      >
-        {toasts.map((toast) => {
-          const variant = VARIANTS[toast.type] || VARIANTS.info;
-          const Icon = variant.icon;
-
-          return (
-            <div
-              key={toast.id}
-              role="status"
-              className={cn(
-                'pointer-events-auto flex w-full max-w-sm animate-slide-up items-start gap-3 rounded-xl border p-3 shadow-pop backdrop-blur',
-                variant.className,
-              )}
-            >
-              <Icon className={cn('mt-0.5 h-5 w-5 shrink-0', variant.iconClassName)} aria-hidden="true" />
-
-              <div className="min-w-0 flex-1">
-                {toast.title && <p className="text-sm font-semibold">{toast.title}</p>}
-                <p className="break-words text-sm leading-snug text-foreground/90">{toast.message}</p>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => dismiss(toast.id)}
-                className="-mr-1 -mt-1 rounded-lg p-1.5 text-muted transition hover:bg-background/40 hover:text-foreground"
-                aria-label="Dismiss notification"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-          );
-        })}
-      </div>
+      <Toaster
+        theme={resolved}
+        position="bottom-right"
+        offset={16}
+        // Lifted clear of the mobile bottom bar, which would otherwise sit on
+        // top of the toast.
+        mobileOffset={{ bottom: '5.75rem', left: '0.75rem', right: '0.75rem' }}
+        gap={10}
+        closeButton
+        toastOptions={{
+          classNames: {
+            toast:
+              '!rounded-2xl !border !border-border !bg-surface-raised/95 !text-foreground !shadow-pop !backdrop-blur-xl',
+            title: '!font-display !text-sm !font-semibold !text-foreground',
+            description: '!text-xs !text-muted',
+            closeButton: '!border-border !bg-surface !text-muted',
+          },
+        }}
+      />
     </ToastContext.Provider>
   );
 }

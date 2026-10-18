@@ -18,7 +18,7 @@ export function THead({ children, className }) {
 }
 
 export function TBody({ children, className }) {
-  return <tbody className={cn('divide-y divide-border', className)}>{children}</tbody>;
+  return <tbody className={cn('divide-y divide-border/70', className)}>{children}</tbody>;
 }
 
 export function TR({ className, children, ...rest }) {
@@ -34,7 +34,7 @@ export function TH({ align = 'left', className, children }) {
     <th
       scope="col"
       className={cn(
-        'whitespace-nowrap px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-muted',
+        'whitespace-nowrap px-3 py-3 text-2xs font-semibold uppercase tracking-[0.08em] text-muted',
         align === 'right' && 'text-right',
         align === 'center' && 'text-center',
         className,
@@ -49,7 +49,7 @@ export function TD({ align = 'left', className, children }) {
   return (
     <td
       className={cn(
-        'px-3 py-3 align-middle text-foreground',
+        'px-3 py-3.5 align-middle text-foreground',
         align === 'right' && 'text-right',
         align === 'center' && 'text-center',
         className,
@@ -121,7 +121,7 @@ export default function DataTable({
                 key={getRowKey(row, index)}
                 onClick={onRowClick ? () => onRowClick(row) : undefined}
                 className={cn(
-                  'transition hover:bg-surface-muted/60',
+                  'transition-colors hover:bg-primary/[0.04]',
                   onRowClick && 'cursor-pointer',
                   rowClassName?.(row),
                 )}
@@ -148,8 +148,8 @@ export default function DataTable({
             <div
               onClick={onRowClick ? () => onRowClick(row) : undefined}
               className={cn(
-                'rounded-xl border border-border bg-surface p-3.5 shadow-card',
-                onRowClick && 'cursor-pointer active:bg-surface-muted/60',
+                'card p-4',
+                onRowClick && 'cursor-pointer transition-colors active:bg-surface-muted/60',
                 rowClassName?.(row),
               )}
             >
@@ -162,7 +162,7 @@ export default function DataTable({
                 <dl className="mt-3 grid grid-cols-2 gap-x-3 gap-y-2 border-t border-border pt-3">
                   {detailColumns.map((column) => (
                     <div key={column.key} className="min-w-0">
-                      <dt className="text-2xs font-medium uppercase tracking-wide text-muted">
+                      <dt className="text-2xs font-medium uppercase tracking-[0.08em] text-muted">
                         {column.mobileLabel || column.header}
                       </dt>
                       <dd className={cn('mt-0.5 truncate text-sm text-foreground')}>{column.cell(row, index)}</dd>

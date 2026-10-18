@@ -24,7 +24,7 @@ const Textarea = forwardRef(function Textarea(
         rows={rows}
         aria-invalid={error ? 'true' : undefined}
         aria-describedby={error ? `${fieldId}-error` : hint ? `${fieldId}-hint` : undefined}
-        className={cn(controlClasses({ error }), 'resize-y leading-relaxed', className)}
+        className={cn(controlClasses({ error }), 'min-h-[5rem] resize-y leading-relaxed', className)}
         {...rest}
       />
     </FormField>

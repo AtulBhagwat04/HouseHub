@@ -3,8 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, KeyRound, MailCheck } from 'lucide-react';
 import * as authService from '@/services/authService';
 import { useDocumentTitle } from '@/hooks';
-import Button from '@/components/ui/Button';
-import Input from '@/components/ui/Input';
+import { Button, Input } from '@/components/ui';
 
 /**
  * Request a password reset.
@@ -51,17 +50,17 @@ export default function ForgotPassword() {
 
     return (
       <div className="space-y-6">
-        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-success-soft text-success">
+        <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-success-soft text-success">
           <MailCheck className="h-6 w-6" aria-hidden="true" />
         </span>
 
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Check your inbox</h1>
+          <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">Check your inbox</h1>
           <p className="mt-1 text-sm text-muted">{sent.message}</p>
         </div>
 
         {devToken && (
-          <div className="rounded-xl border border-warning/30 bg-warning-soft p-3.5">
+          <div className="rounded-2xl border border-warning/30 bg-warning-soft p-3.5">
             <p className="text-xs font-semibold uppercase tracking-wide text-warning">
               Development mode
             </p>
@@ -92,12 +91,12 @@ export default function ForgotPassword() {
 
   return (
     <div className="space-y-6">
-      <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-soft text-primary">
+      <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-soft text-primary">
         <KeyRound className="h-6 w-6" aria-hidden="true" />
       </span>
 
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Forgot your password?</h1>
+        <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">Forgot your password?</h1>
         <p className="mt-1 text-sm text-muted">
           Enter your email and we will send you a link to choose a new one.
         </p>
@@ -125,7 +124,7 @@ export default function ForgotPassword() {
       </form>
 
       <p className="text-center text-sm text-muted">
-        <Link to="/login" className="font-medium text-primary hover:underline">
+        <Link to="/login" className="font-medium text-primary transition hover:underline">
           Back to sign in
         </Link>
       </p>

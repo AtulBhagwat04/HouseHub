@@ -8,7 +8,7 @@ import {
   ClipboardList,
   ListChecks,
   Plus,
-  Trophy,
+  Zap,
 } from 'lucide-react';
 import * as choreService from '@/services/choreService';
 import { useAuth } from '@/context/AuthContext';
@@ -23,13 +23,14 @@ import {
   Card,
   EmptyState,
   ErrorState,
-  Modal,
   PageHeader,
   SectionCard,
   SkeletonCards,
   SkeletonList,
   StatCard,
+  XpBadge,
 } from '@/components/ui';
+import ChoreCelebration, { reportCompletion } from './ChoreCelebration';
 
 /**
  * My chores.
@@ -45,7 +46,7 @@ import {
 export default function MyChores() {
   useDocumentTitle('My chores');
 
-  const { houseId } = useAuth();
+  const { houseId, user } = useAuth();
   const toast = useToast();
 
   const { data, error, loading, refetch } = useFetch(() => choreService.getMyChores(houseId), [houseId]);
@@ -84,7 +85,7 @@ export default function MyChores() {
 
   if (loading) {
     return (
-      <div className="space-y-5">
+      <div className="page-stagger space-y-5">
         {header}
         <SkeletonCards count={4} />
         <Card>
@@ -96,14 +97,14 @@ export default function MyChores() {
 
   if (error) {
     return (
-      <div className="space-y-5">
+      <div className="page-stagger space-y-5">
         {header}
         <ErrorState error={error} onRetry={refetch} />
       </div>
     );
   }
 
-  if (!data) return <div className="space-y-5">{header}</div>;
+  if (!data) return <div className="page-stagger space-y-5">{header}</div>;
 
   const { counts } = data;
 
@@ -115,8 +116,30 @@ export default function MyChores() {
   ];
 
   return (
-    <div className="space-y-5">
+    <div className="page-stagger space-y-5">
       {header}
+
+      {/* The personal half of the gamification: the same level bar shown on the
+          dashboard, so the numbers agree wherever they appear. */}
+      <Card className="relative overflow-hidden">
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-12 -top-16 h-44 w-44 rounded-full bg-gold/15 blur-3xl"
+        />
+
+        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <XpBadge xp={user?.xp} level={user?.level} variant="full" className="sm:flex-1" />
+
+          <div className="flex shrink-0 flex-wrap gap-2">
+            <Badge tone="success" size="md">
+              {pluralise(counts.completed, 'chore')} done
+            </Badge>
+            <Badge tone={counts.overdue > 0 ? 'error' : 'neutral'} size="md">
+              {pluralise(counts.overdue, 'chore')} overdue
+            </Badge>
+          </div>
+        </div>
+      </Card>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
@@ -132,7 +155,8 @@ export default function MyChores() {
       </div>
 
       {counts.overdue > 0 && (
-        <div className="flex items-start gap-3 rounded-xl border border-error/30 bg-error-soft p-3.5 text-sm text-error">
+        <div className="relative flex items-start gap-3 overflow-hidden rounded-2xl border border-error/40 bg-error-soft p-4 text-sm text-error shadow-card">
+          <span aria-hidden="true" className="absolute inset-y-0 left-0 w-1 bg-error" />
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
           <p>
             {pluralise(counts.overdue, 'chore')} past the due date. Clear those first - the house is waiting on them.
@@ -160,7 +184,6 @@ export default function MyChores() {
             <SectionCard
               key={section.key}
               title={section.title}
-              description={section.key === 'completed' ? 'Recently wrapped up.' : undefined}
               action={
                 section.urgency === 'error' ? (
                   <Badge tone="error" size="sm" dot>
@@ -197,14 +220,19 @@ export default function MyChores() {
  *  these are things you act on, not things you compare. */
 function ChoreCard({ chore, completed, busy, onComplete }) {
   const priority = PRIORITY_STYLES[chore.priority] || PRIORITY_STYLES.medium;
+  const overdue = chore.isOverdue && !completed;
 
   return (
     <li
       className={cn(
-        'rounded-xl border p-3.5 shadow-card',
-        chore.isOverdue && !completed ? 'border-error/40 bg-error-soft/40' : 'border-border bg-surface',
+        'relative overflow-hidden rounded-2xl border p-4 shadow-card transition',
+        overdue
+          ? 'border-error/40 bg-error-soft/40'
+          : 'border-border bg-surface hover:border-primary/40 hover:shadow-glow-gold',
       )}
     >
+      {overdue && <span aria-hidden="true" className="absolute inset-y-0 left-0 w-1 bg-error" />}
+
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <Link
@@ -214,22 +242,28 @@ function ChoreCard({ chore, completed, busy, onComplete }) {
             {chore.title}
           </Link>
 
-          <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs">
+          <div className="mt-2 flex flex-wrap items-center gap-2">
             <Badge tone={priority.tone} size="sm">
               {priority.label}
             </Badge>
 
             <span
               className={cn(
-                'inline-flex items-center gap-1',
-                chore.isOverdue && !completed ? 'font-medium text-error' : 'text-muted',
+                'inline-flex items-center gap-1 text-xs',
+                overdue ? 'font-semibold text-error' : 'text-muted',
               )}
             >
-              <CalendarClock className="h-3 w-3" aria-hidden="true" />
+              {overdue ? (
+                <AlertTriangle className="h-3 w-3" aria-hidden="true" />
+              ) : (
+                <CalendarClock className="h-3 w-3" aria-hidden="true" />
+              )}
               {formatDueDate(chore.dueDate)}
             </span>
 
-            <span className="tabular font-semibold text-gold">+{chore.xpReward} XP</span>
+            <Badge tone="gold" size="sm" icon={Zap} className="tabular">
+              +{chore.xpReward} XP
+            </Badge>
           </div>
         </div>
 
@@ -241,7 +275,7 @@ function ChoreCard({ chore, completed, busy, onComplete }) {
       </div>
 
       {completed ? (
-        <p className="mt-2 text-xs text-muted">
+        <p className="mt-2.5 text-xs text-muted">
           Completed by {nameOf(chore.completedBy)}
           {chore.completedAt ? ` on ${formatDateTime(chore.completedAt)}` : ''}
         </p>
@@ -263,80 +297,4 @@ function ChoreCard({ chore, completed, busy, onComplete }) {
 function nameOf(value) {
   if (!value) return 'a housemate';
   return typeof value === 'string' ? 'a housemate' : value.name;
-}
-
-/**
- * Turns a completion response into a toast and, when it is worth shouting
- * about, a celebration modal.
- */
-function reportCompletion(result, toast, onCelebrate) {
-  if (result.alreadyCompleted) {
-    toast.info('This chore was already completed.');
-    return;
-  }
-
-  const awarded = result.xp?.awarded;
-  if (awarded) toast.success(`+${awarded} XP`);
-
-  const achievements = result.newAchievements || [];
-  if (result.unlockedLevel || achievements.length > 0) {
-    onCelebrate({ level: result.unlockedLevel, achievements });
-  }
-}
-
-/** Level-up and achievement fanfare shown after a successful completion. */
-function ChoreCelebration({ celebration, onClose }) {
-  const achievements = celebration?.achievements || [];
-  const level = celebration?.level;
-
-  return (
-    <Modal
-      open={Boolean(celebration)}
-      onClose={onClose}
-      size="sm"
-      title={level ? `Level ${level} reached` : 'Achievement unlocked'}
-      description={level ? 'Your XP crossed a level boundary.' : 'You unlocked something new.'}
-      footer={
-        <Button onClick={onClose} fullWidth>
-          Nice
-        </Button>
-      }
-    >
-      <div className="space-y-3">
-        {level && (
-          <div className="flex items-center gap-3 rounded-xl border border-gold/30 bg-gold/10 p-3">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gold/15 text-gold">
-              <Trophy className="h-5 w-5" aria-hidden="true" />
-            </span>
-            <p className="text-sm font-medium text-foreground">You are now level {level}</p>
-          </div>
-        )}
-
-        {achievements.map((entry) => {
-          // The API may send either the flat definition or `{ definition }`.
-          const definition = entry.definition || entry;
-
-          return (
-            <div
-              key={definition.code || definition.name}
-              className="flex items-start gap-3 rounded-xl border border-border bg-surface-muted/60 p-3"
-            >
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-soft text-lg">
-                {definition.icon ? (
-                  <span aria-hidden="true">{definition.icon}</span>
-                ) : (
-                  <Trophy className="h-5 w-5 text-gold" aria-hidden="true" />
-                )}
-              </span>
-
-              <div className="min-w-0">
-                <p className="text-sm font-semibold text-foreground">{definition.name}</p>
-                {definition.description && <p className="text-xs text-muted">{definition.description}</p>}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </Modal>
-  );
 }

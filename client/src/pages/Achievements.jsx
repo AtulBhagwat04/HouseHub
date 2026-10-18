@@ -52,7 +52,7 @@ export default function Achievements() {
 
   if (loading) {
     return (
-      <div className="space-y-5">
+      <div className="page-stagger space-y-5">
         {header}
         <Card>
           <SkeletonList rows={2} />
@@ -64,20 +64,20 @@ export default function Achievements() {
 
   if (error) {
     return (
-      <div className="space-y-5">
+      <div className="page-stagger space-y-5">
         {header}
         <ErrorState error={error} onRetry={refetch} />
       </div>
     );
   }
 
-  if (!data) return <div className="space-y-5">{header}</div>;
+  if (!data) return <div className="page-stagger space-y-5">{header}</div>;
 
   const { achievements, unlockedCount, totalCount, xp } = data;
 
   if (achievements.length === 0) {
     return (
-      <div className="space-y-5">
+      <div className="page-stagger space-y-5">
         {header}
 
         <Card>
@@ -121,19 +121,24 @@ export default function Achievements() {
   ];
 
   return (
-    <div className="space-y-5">
+    <div className="page-stagger space-y-5">
       {header}
 
-      <Card>
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-xs font-medium uppercase tracking-wide text-muted">Unlocked</p>
-            <p className="tabular mt-1 text-2xl font-semibold text-foreground">
+      <Card className="relative overflow-hidden">
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-12 -top-16 h-44 w-44 rounded-full bg-gold/15 blur-3xl"
+        />
+
+        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
+            <p className="text-2xs font-semibold uppercase tracking-[0.08em] text-muted">Unlocked</p>
+            <p className="tabular mt-1.5 font-display text-2xl font-semibold leading-none text-foreground">
               {unlockedCount}
               <span className="text-base font-normal text-muted"> / {totalCount}</span>
             </p>
-            <div className="mt-2 w-44">
-              <ProgressBar value={unlockedRatio} tone="success" size="sm" />
+            <div className="mt-2.5 w-full max-w-[11rem]">
+              <ProgressBar value={unlockedRatio} tone="gold" size="sm" />
             </div>
             <p className="mt-1.5 text-xs text-muted">
               {pluralise(totalCount - unlockedCount, 'achievement')} still to earn
@@ -168,7 +173,7 @@ export default function Achievements() {
         sections.map((section) => (
           <section key={section.key} className="space-y-3">
             <div className="flex items-center gap-2">
-              <h2 className="text-base font-semibold text-foreground">{section.title}</h2>
+              <h2 className="font-display text-base font-semibold text-foreground">{section.title}</h2>
               <Badge tone="neutral" size="sm">
                 {section.items.length}
               </Badge>
@@ -193,19 +198,37 @@ export default function Achievements() {
 function AchievementCard({ achievement }) {
   const { unlocked, progress, current, target, icon, name, description, unlockedAt } = achievement;
   const remaining = Math.max(0, target - current);
+  const inProgress = !unlocked && current > 0;
 
   return (
     <div
       className={cn(
-        'flex flex-col rounded-xl border p-4 shadow-card sm:p-5',
-        unlocked ? 'border-gold/30 bg-gold/5' : 'border-border bg-surface',
+        'group relative flex flex-col overflow-hidden rounded-2xl border p-4 shadow-card transition sm:p-5',
+        unlocked
+          ? 'border-gold/40 bg-gold/5 shadow-glow-gold hover:-translate-y-0.5'
+          : inProgress
+            ? 'border-border bg-surface hover:-translate-y-0.5 hover:border-primary/40'
+            : // Not started: desaturated and dimmed so it cannot be mistaken
+              // for something earned.
+              'border-border bg-surface/60 opacity-70 saturate-50 hover:opacity-100 hover:saturate-100',
       )}
     >
-      <div className="flex items-start gap-3">
+      {unlocked && (
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-10 -top-14 h-32 w-32 rounded-full bg-gold/20 blur-2xl"
+        />
+      )}
+
+      <div className="relative flex items-start gap-3">
         <span
           className={cn(
-            'flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-xl',
-            unlocked ? 'bg-gold/15' : 'bg-surface-muted',
+            'flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-xl',
+            unlocked
+              ? 'bg-gradient-gold text-white shadow-glow-gold'
+              : inProgress
+                ? 'bg-primary-soft'
+                : 'bg-surface-muted',
           )}
           aria-hidden="true"
         >
@@ -214,7 +237,7 @@ function AchievementCard({ achievement }) {
 
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <p className="truncate text-sm font-semibold text-foreground">{name}</p>
+            <p className="truncate font-display text-sm font-semibold text-foreground">{name}</p>
             {unlocked && (
               <Badge tone="gold" size="sm">
                 Unlocked
@@ -225,16 +248,16 @@ function AchievementCard({ achievement }) {
         </div>
       </div>
 
-      <div className="mt-4 flex-1">
+      <div className="relative mt-4 flex-1">
         <div className="mb-1.5 flex items-center justify-between text-xs text-muted">
-          <span>{unlocked ? 'Complete' : `${current} of ${target}`}</span>
+          <span className="tabular">{unlocked ? 'Complete' : `${current} of ${target}`}</span>
           <span className="tabular">{percentOf(current, target)}%</span>
         </div>
 
         <ProgressBar value={progress} tone={unlocked ? 'gold' : 'primary'} size="sm" />
       </div>
 
-      <p className="mt-2 text-xs text-muted">
+      <p className="relative mt-2 text-xs text-muted">
         {unlocked ? `Unlocked ${formatDate(unlockedAt)}` : `${remaining} to go`}
       </p>
     </div>

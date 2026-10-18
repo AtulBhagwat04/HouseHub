@@ -28,7 +28,7 @@ const Input = forwardRef(function Input(
   const autoId = useId();
   const fieldId = id || autoId;
 
-  const sizeClasses = size === 'lg' ? 'h-11 text-base' : size === 'sm' ? 'h-9 text-sm' : '';
+  const sizeClasses = size === 'lg' ? 'h-12 text-base' : size === 'sm' ? 'h-9 text-sm' : 'h-11';
 
   return (
     <FormField
@@ -42,13 +42,13 @@ const Input = forwardRef(function Input(
       <div className="relative flex items-center">
         {Icon && (
           <Icon
-            className="pointer-events-none absolute left-3 h-4 w-4 text-muted"
+            className="pointer-events-none absolute left-3.5 h-4 w-4 text-muted"
             aria-hidden="true"
           />
         )}
 
         {prefix && (
-          <span className="pointer-events-none absolute left-3 text-sm font-medium text-muted">
+          <span className="pointer-events-none absolute left-3.5 text-sm font-medium text-muted">
             {prefix}
           </span>
         )}
@@ -60,7 +60,7 @@ const Input = forwardRef(function Input(
           aria-describedby={error ? `${fieldId}-error` : hint ? `${fieldId}-hint` : undefined}
           className={cn(
             controlClasses({ error }),
-            Icon || prefix ? 'pl-9' : null,
+            Icon || prefix ? 'pl-10' : null,
             suffix ? 'pr-12' : null,
             sizeClasses,
             inputClassName,
@@ -70,7 +70,7 @@ const Input = forwardRef(function Input(
         />
 
         {suffix && (
-          <span className="pointer-events-none absolute right-3 text-sm text-muted">{suffix}</span>
+          <span className="pointer-events-none absolute right-3.5 text-sm text-muted">{suffix}</span>
         )}
       </div>
     </FormField>

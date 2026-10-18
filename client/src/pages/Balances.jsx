@@ -17,6 +17,7 @@ import {
   SkeletonCards,
   SkeletonList,
   StatCard,
+  Tooltip,
   UserChip,
 } from '@/components/ui';
 import SettlementDialog from '@/components/SettlementDialog';
@@ -106,7 +107,7 @@ export default function Balances() {
   ];
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 page-stagger">
       <PageHeader
         title="Balances"
         description="Recalculated from real expenses and confirmed settlements every time this page loads - nothing here is stored."
@@ -154,22 +155,28 @@ export default function Balances() {
             description="Nothing is outstanding between you and your housemates right now."
           />
         ) : (
-          <ul className="space-y-3">
+          <ul className="space-y-2.5">
             {iOwe.map((transfer) => (
-              <li key={`owe-${transfer.to}`} className="flex flex-wrap items-center gap-2">
+              <li
+                key={`owe-${transfer.to}`}
+                className="flex flex-wrap items-center gap-2 rounded-xl border border-error/20 bg-error-soft/50 px-3 py-2.5"
+              >
                 <TrendingUp className="h-4 w-4 shrink-0 rotate-180 text-error" aria-hidden="true" />
                 <span className="text-sm text-muted">You owe</span>
                 <UserChip user={transfer.toUser} size="sm" />
-                <Money paise={transfer.amount} tone="error" />
+                <Money paise={transfer.amount} tone="error" className="ml-auto" />
               </li>
             ))}
 
             {owedToMe.map((transfer) => (
-              <li key={`owed-${transfer.from}`} className="flex flex-wrap items-center gap-2">
+              <li
+                key={`owed-${transfer.from}`}
+                className="flex flex-wrap items-center gap-2 rounded-xl border border-success/20 bg-success-soft/50 px-3 py-2.5"
+              >
                 <TrendingUp className="h-4 w-4 shrink-0 text-success" aria-hidden="true" />
                 <UserChip user={transfer.fromUser} size="sm" />
                 <span className="text-sm text-muted">owes you</span>
-                <Money paise={transfer.amount} tone="success" />
+                <Money paise={transfer.amount} tone="success" className="ml-auto" />
               </li>
             ))}
           </ul>
@@ -199,7 +206,7 @@ export default function Balances() {
               return (
                 <li
                   key={`${transfer.from}-${transfer.to}`}
-                  className="flex flex-wrap items-center gap-3 py-3"
+                  className="-mx-2 flex flex-wrap items-center gap-3 rounded-xl px-2 py-3 transition hover:bg-primary/[0.04]"
                 >
                   <div className="flex min-w-0 flex-1 items-center gap-2">
                     <UserChip user={transfer.fromUser} size="sm" truncate />
@@ -209,18 +216,21 @@ export default function Balances() {
 
                   <Money paise={transfer.amount} tone="default" />
 
-                  <Button
-                    size="xs"
-                    variant="outline"
-                    icon={HandCoins}
-                    disabled={!mine}
-                    title={mine ? undefined : 'This payment is between two other housemates'}
-                    onClick={() =>
-                      openDialog({ from: transfer.from, to: transfer.to, amount: transfer.amount })
-                    }
-                  >
-                    Settle up
-                  </Button>
+                  <Tooltip content={mine ? undefined : 'This payment is between two other housemates'}>
+                    <span className="inline-flex">
+                      <Button
+                        size="sm"
+                        variant={mine ? 'secondary' : 'outline'}
+                        icon={HandCoins}
+                        disabled={!mine}
+                        onClick={() =>
+                          openDialog({ from: transfer.from, to: transfer.to, amount: transfer.amount })
+                        }
+                      >
+                        Settle up
+                      </Button>
+                    </span>
+                  </Tooltip>
                 </li>
               );
             })}

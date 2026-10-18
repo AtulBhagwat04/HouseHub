@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
+  AlertTriangle,
   CalendarClock,
   CheckCircle2,
   ClipboardList,
@@ -12,8 +13,8 @@ import {
   Plus,
   Search,
   Trash2,
-  Trophy,
   X,
+  Zap,
 } from 'lucide-react';
 import * as choreService from '@/services/choreService';
 import * as houseService from '@/services/houseService';
@@ -33,13 +34,13 @@ import {
   EmptyState,
   ErrorState,
   Input,
-  Modal,
   PageHeader,
   Pagination,
   Select,
   Tabs,
   UserChip,
 } from '@/components/ui';
+import ChoreCelebration, { reportCompletion } from './ChoreCelebration';
 
 const PAGE_SIZE = 20;
 const DEFAULT_SORT = 'dueDate:asc';
@@ -228,6 +229,7 @@ export default function Chores() {
       mobilePrimary: true,
       cell: (row) => {
         const priority = PRIORITY_STYLES[row.priority] || PRIORITY_STYLES.medium;
+        const overdue = row.derivedStatus === 'overdue';
 
         return (
           <div className="min-w-0">
@@ -247,11 +249,15 @@ export default function Chores() {
                 rides along under the title instead. */}
             <p
               className={cn(
-                'mt-0.5 flex items-center gap-1.5 text-xs sm:hidden',
-                row.isOverdue ? 'text-error' : 'text-muted',
+                'mt-1 flex items-center gap-1.5 text-xs sm:hidden',
+                overdue ? 'font-semibold text-error' : 'text-muted',
               )}
             >
-              <CalendarClock className="h-3 w-3" aria-hidden="true" />
+              {overdue ? (
+                <AlertTriangle className="h-3 w-3" aria-hidden="true" />
+              ) : (
+                <CalendarClock className="h-3 w-3" aria-hidden="true" />
+              )}
               {formatDueDate(row.dueDate)}
             </p>
           </div>
@@ -273,18 +279,26 @@ export default function Chores() {
       key: 'due',
       header: 'Due',
       mobileHidden: true,
-      cell: (row) => (
-        <span className={cn('text-sm', row.isOverdue ? 'font-medium text-error' : 'text-muted')}>
-          {formatDueDate(row.dueDate)}
-        </span>
-      ),
+      cell: (row) =>
+        row.derivedStatus === 'overdue' ? (
+          <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-error">
+            <AlertTriangle className="h-3.5 w-3.5" aria-hidden="true" />
+            {formatDueDate(row.dueDate)}
+          </span>
+        ) : (
+          <span className="text-sm text-muted">{formatDueDate(row.dueDate)}</span>
+        ),
     },
     {
       key: 'xp',
       header: 'XP',
       align: 'right',
       mobileLabel: 'Reward',
-      cell: (row) => <span className="tabular text-sm font-semibold text-gold">+{row.xpReward} XP</span>,
+      cell: (row) => (
+        <Badge tone="gold" size="sm" icon={Zap} className="tabular">
+          +{row.xpReward} XP
+        </Badge>
+      ),
     },
     {
       key: 'status',
@@ -309,7 +323,7 @@ export default function Chores() {
         <Dropdown
           align="right"
           trigger={
-            <Button variant="ghost" size="icon-sm" aria-label={`Actions for ${row.title}`}>
+            <Button variant="ghost" size="icon" aria-label={`Actions for ${row.title}`}>
               <MoreVertical className="h-4 w-4" />
             </Button>
           }
@@ -344,7 +358,7 @@ export default function Chores() {
   );
 
   return (
-    <div className="space-y-5">
+    <div className="page-stagger space-y-5">
       <PageHeader
         title="Chores"
         description="Everything the house has to get done, and who is on it."
@@ -354,7 +368,7 @@ export default function Chores() {
               My chores
             </Button>
             <Button as={Link} to="/chores/new" size="sm" icon={Plus}>
-              Add chore
+              New chore
             </Button>
           </>
         }
@@ -432,8 +446,17 @@ export default function Chores() {
             loading={loading}
             emptyState={emptyState}
             // No outer card on phones - the stacked rows already look like
-            // cards, and nesting them would double up the borders.
-            className="sm:rounded-xl sm:border sm:border-border sm:bg-surface sm:p-4 sm:shadow-card"
+            // cards, and nesting them would double up the borders. Overdue
+            // rows get an error wash so they read as urgent, not just labelled.
+            rowClassName={(row) =>
+              cn(
+                'transition-shadow',
+                row.derivedStatus === 'overdue'
+                  ? 'bg-error-soft/40'
+                  : 'hover:shadow-glow-gold sm:hover:shadow-none',
+              )
+            }
+            className="sm:rounded-2xl sm:border sm:border-border sm:bg-surface sm:p-4 sm:shadow-card"
           />
 
           <Pagination meta={meta} onChange={(page) => applyFilters({ page })} itemLabel="chore" className="px-1" />
@@ -462,80 +485,4 @@ export default function Chores() {
 /** `createdBy` / `assignedTo` arrive either populated (an object) or as an id. */
 function idOf(value) {
   return typeof value === 'string' ? value : value?._id || null;
-}
-
-/**
- * Turns a completion response into a toast and, when it is worth shouting
- * about, a celebration modal.
- */
-function reportCompletion(result, toast, onCelebrate) {
-  if (result.alreadyCompleted) {
-    toast.info('This chore was already completed.');
-    return;
-  }
-
-  const awarded = result.xp?.awarded;
-  if (awarded) toast.success(`+${awarded} XP`);
-
-  const achievements = result.newAchievements || [];
-  if (result.unlockedLevel || achievements.length > 0) {
-    onCelebrate({ level: result.unlockedLevel, achievements });
-  }
-}
-
-/** Level-up and achievement fanfare shown after a successful completion. */
-function ChoreCelebration({ celebration, onClose }) {
-  const achievements = celebration?.achievements || [];
-  const level = celebration?.level;
-
-  return (
-    <Modal
-      open={Boolean(celebration)}
-      onClose={onClose}
-      size="sm"
-      title={level ? `Level ${level} reached` : 'Achievement unlocked'}
-      description={level ? 'Your XP crossed a level boundary.' : 'You unlocked something new.'}
-      footer={
-        <Button onClick={onClose} fullWidth>
-          Nice
-        </Button>
-      }
-    >
-      <div className="space-y-3">
-        {level && (
-          <div className="flex items-center gap-3 rounded-xl border border-gold/30 bg-gold/10 p-3">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gold/15 text-gold">
-              <Trophy className="h-5 w-5" aria-hidden="true" />
-            </span>
-            <p className="text-sm font-medium text-foreground">You are now level {level}</p>
-          </div>
-        )}
-
-        {achievements.map((entry) => {
-          // The API may send either the flat definition or `{ definition }`.
-          const definition = entry.definition || entry;
-
-          return (
-            <div
-              key={definition.code || definition.name}
-              className="flex items-start gap-3 rounded-xl border border-border bg-surface-muted/60 p-3"
-            >
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-soft text-lg">
-                {definition.icon ? (
-                  <span aria-hidden="true">{definition.icon}</span>
-                ) : (
-                  <Trophy className="h-5 w-5 text-gold" aria-hidden="true" />
-                )}
-              </span>
-
-              <div className="min-w-0">
-                <p className="text-sm font-semibold text-foreground">{definition.name}</p>
-                {definition.description && <p className="text-xs text-muted">{definition.description}</p>}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </Modal>
-  );
 }
