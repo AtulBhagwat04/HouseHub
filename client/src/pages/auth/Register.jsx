@@ -4,8 +4,7 @@ import { Eye, EyeOff, UserPlus } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
 import { useDocumentTitle } from '@/hooks';
-import Button from '@/components/ui/Button';
-import Input from '@/components/ui/Input';
+import { Button, Input } from '@/components/ui';
 
 /**
  * Minimum password policy.
@@ -87,12 +86,12 @@ export default function Register() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Create your account</h1>
+        <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">Create your account</h1>
         <p className="mt-1 text-sm text-muted">It takes about thirty seconds.</p>
       </div>
 
       {formError && (
-        <div role="alert" className="rounded-lg border border-error/30 bg-error-soft px-3.5 py-2.5 text-sm text-error">
+        <div role="alert" className="animate-fade-in rounded-xl border border-error/30 bg-error-soft px-3.5 py-2.5 text-sm text-error">
           {formError}
         </div>
       )}
@@ -132,13 +131,14 @@ export default function Register() {
             onChange={update('password')}
             error={fieldErrors.password}
             hint={!fieldErrors.password ? `Use at least ${MIN_PASSWORD} characters.` : undefined}
+            inputClassName="pr-11"
             required
           />
 
           <button
             type="button"
             onClick={() => setShowPassword((value) => !value)}
-            className="absolute right-2.5 top-[30px] rounded-md p-1.5 text-muted transition hover:text-foreground"
+            className="absolute right-1.5 top-[30px] flex h-9 w-9 items-center justify-center rounded-lg text-muted transition hover:bg-surface-muted hover:text-foreground"
             aria-label={showPassword ? 'Hide password' : 'Show password'}
           >
             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -164,7 +164,7 @@ export default function Register() {
 
       <p className="text-center text-sm text-muted">
         Already have an account?{' '}
-        <Link to="/login" className="font-medium text-primary hover:underline">
+        <Link to="/login" className="font-medium text-primary transition hover:underline">
           Sign in
         </Link>
       </p>

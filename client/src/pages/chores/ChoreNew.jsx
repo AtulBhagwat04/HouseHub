@@ -50,7 +50,7 @@ export default function ChoreNew() {
   // would start empty and the current user would not be preselected.
   if (loading) {
     return (
-      <div className="space-y-5">
+      <div className="page-stagger space-y-5">
         {header}
         <Card className="space-y-4">
           <Skeleton className="h-10 w-full" />
@@ -64,7 +64,7 @@ export default function ChoreNew() {
 
   if (error) {
     return (
-      <div className="space-y-5">
+      <div className="page-stagger space-y-5">
         {header}
         <ErrorState error={error} onRetry={refetch} />
       </div>
@@ -72,7 +72,7 @@ export default function ChoreNew() {
   }
 
   return (
-    <div className="space-y-5">
+    <div className="page-stagger space-y-5">
       {header}
 
       {members.length === 0 ? (
@@ -89,16 +89,23 @@ export default function ChoreNew() {
           />
         </Card>
       ) : (
-        <Card>
-          <ChoreForm
-            mode="create"
-            members={members}
-            submitting={submitting}
-            onSubmit={handleSubmit}
-            submitLabel="Add chore"
-            fieldErrors={fieldErrors}
-            onCancel={() => navigate('/chores')}
+        <Card className="relative overflow-hidden">
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-primary/10 blur-3xl"
           />
+
+          <div className="relative">
+            <ChoreForm
+              mode="create"
+              members={members}
+              submitting={submitting}
+              onSubmit={handleSubmit}
+              submitLabel="Add chore"
+              fieldErrors={fieldErrors}
+              onCancel={() => navigate('/chores')}
+            />
+          </div>
         </Card>
       )}
     </div>

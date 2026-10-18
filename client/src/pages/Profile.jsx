@@ -58,13 +58,13 @@ export default function Profile() {
 
   if (!user) {
     return (
-      <div className="space-y-5">
+      <div className="page-stagger space-y-5">
         <PageHeader
           breadcrumbs={[{ label: 'Dashboard', to: '/dashboard' }, { label: 'Profile' }]}
           title="Profile"
         />
         <Card>
-          <Skeleton className="h-24 w-full" />
+          <Skeleton className="h-24 w-full" rounded="rounded-xl" />
         </Card>
       </div>
     );
@@ -152,7 +152,7 @@ export default function Profile() {
   }
 
   return (
-    <div className="space-y-5">
+    <div className="page-stagger space-y-5">
       <PageHeader
         breadcrumbs={[{ label: 'Dashboard', to: '/dashboard' }, { label: 'Profile' }]}
         title="Profile"
@@ -160,13 +160,20 @@ export default function Profile() {
       />
 
       {/* Header ---------------------------------------------------------- */}
-      <Card>
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+      <Card className="overflow-hidden">
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-12 -top-16 h-44 w-44 rounded-full bg-secondary/20 blur-3xl"
+        />
+
+        <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center">
           <Avatar src={user.avatarUrl} name={user.name} size="xl" />
 
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
-              <h2 className="truncate text-lg font-semibold tracking-tight text-foreground">{user.name}</h2>
+              <h2 className="truncate font-display text-xl font-semibold tracking-tight text-foreground">
+                {user.name}
+              </h2>
               {role && <Badge tone={ROLE_TONES[role] || 'neutral'}>{ROLE_LABELS[role] || 'Member'}</Badge>}
             </div>
 
@@ -221,7 +228,7 @@ export default function Profile() {
         </SectionCard>
 
         {/* Stats -------------------------------------------------------- */}
-        <SectionCard title="Your record" description="Lifetime totals, straight from the server.">
+        <SectionCard title="Your record" description="Lifetime totals.">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             <StatTile label="Chores done" value={stats.choresCompleted || 0} />
             <StatTile label="Chores added" value={stats.choresCreated || 0} />
@@ -233,7 +240,7 @@ export default function Profile() {
 
           <Link
             to="/achievements"
-            className="mt-4 flex items-center justify-between gap-3 rounded-lg border border-border bg-surface-muted/60 px-3 py-3 transition hover:bg-surface-muted"
+            className="mt-4 flex items-center justify-between gap-3 rounded-xl border border-border bg-surface-muted/60 px-3 py-3 transition hover:border-gold/40 hover:bg-gold/5"
           >
             <span className="flex min-w-0 items-center gap-2.5">
               <Award className="h-4 w-4 shrink-0 text-gold" aria-hidden="true" />
@@ -312,11 +319,11 @@ export default function Profile() {
       </SectionCard>
 
       {/* Danger zone ---------------------------------------------------- */}
-      <Card className="border-error/30">
+      <Card className="border-error/30 bg-error-soft/40">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="min-w-0">
-            <h2 className="text-base font-semibold text-foreground">Delete account</h2>
-            <p className="mt-0.5 text-sm text-muted">
+            <h2 className="font-display text-base font-semibold text-foreground">Delete account</h2>
+            <p className="mt-0.5 max-w-2xl text-sm text-muted text-pretty">
               If you own a house that still has other members, hand ownership over or remove them first -
               the API refuses the delete until the house is not left without an owner. Deleting the account
               of the last member also deletes the house and everything in it.
@@ -379,9 +386,9 @@ export default function Profile() {
 
 function StatTile({ label, value }) {
   return (
-    <div className="rounded-xl border border-border bg-surface-muted/60 p-3 text-center">
-      <p className="tabular text-lg font-semibold text-foreground">{value}</p>
-      <p className="mt-0.5 text-2xs uppercase tracking-wide text-muted">{label}</p>
+    <div className="rounded-xl border border-border bg-surface-muted/60 p-3 text-center transition hover:border-primary/40">
+      <p className="tabular font-display text-lg font-semibold text-foreground">{value}</p>
+      <p className="mt-0.5 text-2xs font-medium uppercase tracking-wide text-muted">{label}</p>
     </div>
   );
 }

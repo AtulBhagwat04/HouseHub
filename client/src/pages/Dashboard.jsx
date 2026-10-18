@@ -75,14 +75,14 @@ export default function Dashboard() {
   const firstName = user?.name?.split(' ')[0] || 'there';
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 page-stagger">
       {/* Header ---------------------------------------------------------- */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div className="min-w-0">
+          <h2 className="font-display text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
             Hi {firstName} <span aria-hidden="true">👋</span>
           </h2>
-          <p className="mt-0.5 text-sm text-muted">
+          <p className="mt-1 text-sm text-muted">
             Here is what is happening in {house?.name || 'your house'}.
           </p>
         </div>
@@ -107,7 +107,7 @@ export default function Dashboard() {
           tone="primary"
         />
         <StatCard
-          label="You owe"
+          label={<span className={financials.youOwe > 0 ? 'text-error' : undefined}>You owe</span>}
           value={formatCurrency(financials.youOwe)}
           sub={
             financials.youOweTo.length > 0
@@ -118,7 +118,7 @@ export default function Dashboard() {
           tone={financials.youOwe > 0 ? 'error' : 'default'}
         />
         <StatCard
-          label="You are owed"
+          label={<span className={financials.youAreOwed > 0 ? 'text-success' : undefined}>You are owed</span>}
           value={formatCurrency(financials.youAreOwed)}
           sub={
             financials.owedToYouBy.length > 0
@@ -206,7 +206,7 @@ export default function Dashboard() {
                     <li key={chore._id}>
                       <Link
                         to={`/chores/${chore._id}`}
-                        className="flex items-center gap-3 py-3 transition hover:opacity-80"
+                        className="-mx-2 flex items-center gap-3 rounded-xl px-2 py-3 transition hover:bg-primary/[0.04]"
                       >
                         <span
                           className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
@@ -274,7 +274,7 @@ export default function Dashboard() {
                     <li key={expense._id}>
                       <Link
                         to={`/expenses/${expense._id}`}
-                        className="flex items-center gap-3 py-3 transition hover:opacity-80"
+                        className="-mx-2 flex items-center gap-3 rounded-xl px-2 py-3 transition hover:bg-primary/[0.04]"
                       >
                         <span
                           className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-base"
@@ -306,7 +306,7 @@ export default function Dashboard() {
         {/* Right column ------------------------------------------------ */}
         <div className="space-y-5">
           {/* House chores */}
-          <SectionCard title="House chores" description="Across everyone in the house.">
+          <SectionCard title="House chores">
             <div className="grid grid-cols-3 gap-3">
               <MiniStat label="Open" value={chores.houseOpen} />
               <MiniStat label="Overdue" value={chores.houseOverdue} tone={chores.houseOverdue > 0 ? 'error' : 'default'} />
@@ -433,7 +433,7 @@ function MiniStat({ label, value, tone = 'default' }) {
 
   return (
     <div className="rounded-xl border border-border bg-surface-muted/60 p-2.5 text-center">
-      <p className={`tabular text-lg font-semibold ${toneClasses[tone]}`}>{value}</p>
+      <p className={`tabular font-display text-lg font-semibold ${toneClasses[tone]}`}>{value}</p>
       <p className="mt-0.5 text-2xs uppercase tracking-wide text-muted">{label}</p>
     </div>
   );
@@ -443,9 +443,9 @@ function QuickLink({ to, icon: Icon, label }) {
   return (
     <Link
       to={to}
-      className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2.5 text-sm font-medium text-foreground transition hover:bg-surface-muted"
+      className="group flex min-h-9 items-center gap-2 rounded-xl border border-border bg-surface-muted/40 px-3 py-2.5 text-sm font-medium text-foreground transition hover:-translate-y-0.5 hover:border-primary/40 hover:bg-primary/[0.04] active:scale-[0.98]"
     >
-      <Icon className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+      <Icon className="h-4 w-4 shrink-0 text-primary transition group-hover:scale-110" aria-hidden="true" />
       <span className="truncate">{label}</span>
     </Link>
   );

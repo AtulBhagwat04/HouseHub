@@ -66,7 +66,7 @@ export default function HouseSettings() {
 
   if (!isManager) {
     return (
-      <div className="space-y-5">
+      <div className="page-stagger space-y-5">
         <PageHeader
           breadcrumbs={[
             { label: 'Dashboard', to: '/dashboard' },
@@ -175,7 +175,7 @@ export default function HouseSettings() {
   const isLastMember = (house?.memberCount ?? 1) <= 1;
 
   return (
-    <div className="space-y-5">
+    <div className="page-stagger space-y-5">
       <PageHeader
         breadcrumbs={[
           { label: 'Dashboard', to: '/dashboard' },
@@ -190,9 +190,9 @@ export default function HouseSettings() {
       {loading ? (
         <Card>
           <div className="space-y-4">
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-20 w-full" />
+            <Skeleton className="h-11 w-full" rounded="rounded-xl" />
+            <Skeleton className="h-11 w-full" rounded="rounded-xl" />
+            <Skeleton className="h-20 w-full" rounded="rounded-xl" />
           </div>
         </Card>
       ) : error ? (
@@ -213,36 +213,39 @@ export default function HouseSettings() {
                   required
                 />
 
-                <Input
-                  label="Location"
-                  name="location"
-                  value={form.location}
-                  onChange={update('location')}
-                  hint="Optional. Helps if you have more than one place."
-                />
-
                 <Textarea
                   label="Description"
                   name="description"
                   rows={3}
                   value={form.description}
                   onChange={update('description')}
-                  hint="Optional. Anything a guest would need to find you."
+                  hint="Optional."
                 />
 
-                <Input
-                  label="Image URL"
-                  name="imageUrl"
-                  value={form.imageUrl}
-                  onChange={update('imageUrl')}
-                  hint="Optional. File uploads arrive in a later phase, so paste a link for now."
-                />
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Input
+                    label="Location"
+                    name="location"
+                    value={form.location}
+                    onChange={update('location')}
+                    hint="Optional."
+                  />
+
+                  <Input
+                    label="Image URL"
+                    name="imageUrl"
+                    value={form.imageUrl}
+                    onChange={update('imageUrl')}
+                    hint="Optional. Paste a link for now."
+                  />
+                </div>
               </div>
             </SectionCard>
 
             <SectionCard title="House preferences" description="These apply to everyone in the house.">
               <div className="space-y-4">
                 <Checkbox
+                  variant="switch"
                   label="Allow new members to join"
                   description="With this off, the current invite code stops working."
                   checked={form.allowInvites}
@@ -250,6 +253,7 @@ export default function HouseSettings() {
                 />
 
                 <Checkbox
+                  variant="switch"
                   label="Send house notifications"
                   description="Chore, expense and settlement updates go out to the house."
                   checked={form.notificationsEnabled}
@@ -293,11 +297,11 @@ export default function HouseSettings() {
             </SectionCard>
           </form>
 
-          <Card className="border-error/30">
+          <Card className="border-error/30 bg-error-soft/40">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="min-w-0">
-                <h2 className="text-base font-semibold text-foreground">Leave house</h2>
-                <p className="mt-0.5 text-sm text-muted">
+                <h2 className="font-display text-base font-semibold text-foreground">Leave house</h2>
+                <p className="mt-0.5 max-w-2xl text-sm text-muted text-pretty">
                   {isLastMember
                     ? 'You are the last member, so leaving deletes this house along with every expense, chore and settlement in it. There is no way back from that.'
                     : 'You will lose access to every expense, chore and settlement in this house. If you are the owner, transfer ownership on the Members page first - the API refuses a leave until you do.'}

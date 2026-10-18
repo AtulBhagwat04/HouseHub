@@ -6,8 +6,7 @@ import { setStoredToken } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
 import { useDocumentTitle } from '@/hooks';
-import Button from '@/components/ui/Button';
-import Input from '@/components/ui/Input';
+import { Button, Input } from '@/components/ui';
 
 /** Matches the server's own floor (`passwordValidators.new` rejects under 8). */
 const MIN_PASSWORD = 8;
@@ -67,19 +66,19 @@ export default function ResetPassword() {
 
   return (
     <div className="space-y-6">
-      <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-soft text-primary">
+      <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-soft text-primary">
         <LockKeyhole className="h-6 w-6" aria-hidden="true" />
       </span>
 
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Choose a new password</h1>
+        <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">Choose a new password</h1>
         <p className="mt-1 text-sm text-muted">
           This link can only be used once, and it expires thirty minutes after it was requested.
         </p>
       </div>
 
       {error && (
-        <div role="alert" className="rounded-lg border border-error/30 bg-error-soft px-3.5 py-2.5 text-sm text-error">
+        <div role="alert" className="animate-fade-in rounded-xl border border-error/30 bg-error-soft px-3.5 py-2.5 text-sm text-error">
           {error}
         </div>
       )}
@@ -99,13 +98,14 @@ export default function ResetPassword() {
               setError('');
             }}
             error={fieldErrors.password}
+            inputClassName="pr-11"
             required
           />
 
           <button
             type="button"
             onClick={() => setShowPassword((value) => !value)}
-            className="absolute right-2.5 top-[30px] rounded-md p-1.5 text-muted transition hover:text-foreground"
+            className="absolute right-1.5 top-[30px] flex h-9 w-9 items-center justify-center rounded-lg text-muted transition hover:bg-surface-muted hover:text-foreground"
             aria-label={showPassword ? 'Hide password' : 'Show password'}
           >
             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -133,7 +133,7 @@ export default function ResetPassword() {
       </form>
 
       <p className="text-center text-sm text-muted">
-        <Link to="/login" className="font-medium text-primary hover:underline">
+        <Link to="/login" className="font-medium text-primary transition hover:underline">
           Back to sign in
         </Link>
       </p>

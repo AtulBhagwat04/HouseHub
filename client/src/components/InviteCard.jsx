@@ -4,9 +4,7 @@ import { cn } from '@/lib/cn';
 import { copyToClipboard } from '@/lib/clipboard';
 import { useToast } from '@/context/ToastContext';
 import * as houseService from '@/services/houseService';
-import Button from '@/components/ui/Button';
-import ConfirmDialog from '@/components/ui/ConfirmDialog';
-import { Card } from '@/components/ui/Card';
+import { Button, Card, ConfirmDialog, Tooltip } from '@/components/ui';
 
 /**
  * The invite panel: code, shareable link, and (for managers) regenerate.
@@ -76,11 +74,11 @@ export default function InviteCard({
   }
 
   return (
-    <Card className={cn(compact && 'p-4')}>
-      <div className="flex items-start justify-between gap-3">
+    <Card className={cn('overflow-hidden', compact && 'p-4')}>
+      <div className="relative flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h2 className="flex items-center gap-2 text-base font-semibold text-foreground">
-            <Users className="h-4 w-4 text-primary" aria-hidden="true" />
+          <h2 className="flex items-center gap-2 font-display text-base font-semibold text-foreground">
+            <Users className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
             Invite your housemates
           </h2>
           <p className="mt-1 text-sm text-muted">
@@ -90,38 +88,43 @@ export default function InviteCard({
           </p>
         </div>
 
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          onClick={() => setConfirmOpen(true)}
-          disabled={!allowInvites || !canManage}
-          aria-label="Generate a new invite code"
-          title={canManage ? 'Generate a new invite code' : 'Only an owner or admin can generate a new code'}
-          className={cn(!canManage && 'hidden')}
-        >
-          <RefreshCw className="h-4 w-4" />
-        </Button>
+        {canManage && (
+          <Tooltip content={allowInvites ? 'Generate a new invite code' : 'Invites are turned off for this house'}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setConfirmOpen(true)}
+              disabled={!allowInvites}
+              aria-label="Generate a new invite code"
+              className="shrink-0"
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+          </Tooltip>
+        )}
       </div>
 
-      <div className="mt-4 space-y-3">
-        <div className="flex items-center gap-2">
-          <div className="flex h-11 min-w-0 flex-1 items-center gap-2 rounded-lg border border-dashed border-primary/40 bg-primary-soft/50 px-3">
-            <span className="truncate font-mono text-sm font-semibold tracking-wider text-primary">{code || 'Unavailable'}</span>
-          </div>
+      <div className="relative mt-4 space-y-3">
+        <div className="flex items-center gap-2 rounded-2xl border border-primary/25 bg-primary-soft/50 py-2 pl-4 pr-2">
+          <span className="min-w-0 flex-1 truncate font-mono text-xl font-semibold tracking-[0.18em] text-primary tabular">
+            {code || 'Unavailable'}
+          </span>
 
-          <Button
-            variant="outline"
-            size="md"
-            icon={copied === 'code' ? Check : Copy}
-            onClick={() => copy(code, 'code')}
-            disabled={!code}
-          >
-            <span className="hidden sm:inline">{copied === 'code' ? 'Copied' : 'Copy code'}</span>
-            <span className="sm:hidden">{copied === 'code' ? 'Copied' : 'Code'}</span>
-          </Button>
+          <Tooltip content={copied === 'code' ? 'Copied' : 'Copy the invite code'}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => copy(code, 'code')}
+              disabled={!code}
+              aria-label="Copy the invite code"
+              className={cn('shrink-0', copied === 'code' && 'text-success')}
+            >
+              {copied === 'code' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+            </Button>
+          </Tooltip>
         </div>
 
-        <div className="flex items-center gap-2 rounded-lg border border-border bg-surface-muted px-3 py-2.5">
+        <div className="flex items-center gap-2 rounded-xl border border-border bg-surface-muted/60 px-3 py-2.5">
           <Link2 className="h-4 w-4 shrink-0 text-muted" aria-hidden="true" />
           <span className="min-w-0 flex-1 truncate text-xs text-muted">{link || 'No link yet'}</span>
         </div>
@@ -131,7 +134,7 @@ export default function InviteCard({
             {copied === 'link' ? 'Link copied' : 'Copy link'}
           </Button>
 
-          <Button variant="ghost" size="sm" icon={Share2} onClick={share} disabled={!link}>
+          <Button variant="outline" size="sm" icon={Share2} onClick={share} disabled={!link}>
             Share
           </Button>
         </div>

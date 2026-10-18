@@ -18,6 +18,7 @@ import {
   ErrorState,
   Money,
   PageHeader,
+  Skeleton,
   SkeletonCards,
   XpBadge,
 } from '@/components/ui';
@@ -168,7 +169,7 @@ export default function Members() {
   }
 
   return (
-    <div className="space-y-5">
+    <div className="page-stagger space-y-5">
       <PageHeader
         breadcrumbs={[{ label: 'Dashboard', to: '/dashboard' }, { label: 'House', to: '/house' }, { label: 'Members' }]}
         title="Members"
@@ -203,10 +204,21 @@ export default function Members() {
 
             return (
               <li key={member._id}>
-                <Card className="flex h-full flex-col gap-4">
+                <Card className="flex h-full flex-col gap-4 transition hover:border-primary/40 hover:bg-primary/[0.04]">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex min-w-0 items-center gap-3">
-                      <Avatar src={member.avatarUrl} name={member.name} size="lg" />
+                      <Avatar
+                        src={member.avatarUrl}
+                        name={member.name}
+                        size="lg"
+                        className={
+                          member.role === 'owner'
+                            ? 'ring-2 ring-gold/40'
+                            : member.role === 'admin'
+                              ? 'ring-2 ring-primary/40'
+                              : undefined
+                        }
+                      />
 
                       <div className="min-w-0">
                         <p className="truncate text-sm font-semibold text-foreground">
@@ -230,7 +242,12 @@ export default function Members() {
                         items={items}
                         disabled={busy}
                         trigger={
-                          <Button variant="ghost" size="icon-sm" aria-label={`Actions for ${member.name}`}>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            aria-label={`Actions for ${member.name}`}
+                            className="shrink-0"
+                          >
                             <MoreVertical className="h-4 w-4" />
                           </Button>
                         }
@@ -240,15 +257,13 @@ export default function Members() {
 
                   <div className="flex flex-wrap items-center gap-2">
                     <XpBadge xp={member.xp} level={member.level} variant="chip" />
-                    <Badge tone="neutral" size="sm">
-                      Rank #{member.rank ?? '—'}
-                    </Badge>
+                    <XpBadge variant="rank" rank={member.rank} />
                     <Badge tone="neutral" size="sm">
                       {pluralise(member.choresCompleted, 'chore')} done
                     </Badge>
                   </div>
 
-                  <div className="mt-auto flex items-center justify-between gap-3 rounded-lg border border-border bg-surface-muted/60 px-3 py-2.5">
+                  <div className="mt-auto flex items-center justify-between gap-3 rounded-xl border border-border bg-surface-muted/60 px-3 py-2.5">
                     <span className="text-xs text-muted">{balanceCaption(member.balance)}</span>
                     <Money paise={member.balance} signed tone="auto" />
                   </div>
@@ -263,28 +278,25 @@ export default function Members() {
       <div id="house-invite" className="scroll-mt-24">
         {inviteLoading ? (
           <Card>
-            <div className="h-32 animate-pulse rounded-lg bg-surface-muted" />
+            <Skeleton className="h-32 w-full" rounded="rounded-xl" />
           </Card>
         ) : invite ? (
-          <>
-            <InviteCard
-              houseId={houseId}
-              inviteCode={invite.inviteCode}
-              inviteLink={invite.inviteLink}
-              allowInvites={invite.allowInvites}
-              canManage={canManage}
-            />
-
-          </>
+          <InviteCard
+            houseId={houseId}
+            inviteCode={invite.inviteCode}
+            inviteLink={invite.inviteLink}
+            allowInvites={invite.allowInvites}
+            canManage={canManage}
+          />
         ) : null}
       </div>
 
       {/* Leaving -------------------------------------------------------- */}
-      <Card className="border-error/30">
+      <Card className="border-error/30 bg-error-soft/40">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="min-w-0">
-            <h2 className="text-base font-semibold text-foreground">Leave this house</h2>
-            <p className="mt-0.5 text-sm text-muted">
+            <h2 className="font-display text-base font-semibold text-foreground">Leave this house</h2>
+            <p className="mt-0.5 max-w-2xl text-sm text-muted text-pretty">
               {isOwner && totalMembers > 1
                 ? 'You are the owner, so you have to transfer ownership to someone else before you can leave.'
                 : 'You will lose access to every expense, chore and settlement in this house.'}

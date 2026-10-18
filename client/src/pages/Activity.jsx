@@ -8,17 +8,22 @@ import { formatRelativeTime, titleCase } from '@/lib/format';
 import {
   Avatar,
   Badge,
-  Card,
   EmptyState,
   ErrorState,
   PageHeader,
   Pagination,
-  Select,
+  SectionCard,
   SkeletonList,
+  Tabs,
 } from '@/components/ui';
 import { cn } from '@/lib/cn';
 
 const PAGE_SIZE = 20;
+
+const TYPE_TABS = [
+  { value: '', label: 'All activity' },
+  ...ACTIVITY_TYPES.map((value) => ({ value, label: titleCase(value) })),
+];
 
 /** Coarse tone per event type, so the timeline reads as good/bad/neutral at a glance. */
 function toneFor(type) {
@@ -77,32 +82,28 @@ export default function Activity() {
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 page-stagger">
       <PageHeader
         breadcrumbs={[{ label: 'Dashboard', to: '/dashboard' }, { label: 'Activity' }]}
         title="Activity"
         description="The house history: expenses, chores, settlements and achievements, newest first."
       />
 
-      <Select
-        label="Filter by type"
+      <Tabs
+        variant="pills"
+        tabs={TYPE_TABS}
         value={type}
-        onChange={(event) => changeType(event.target.value)}
-        containerClassName="max-w-xs"
-        options={[
-          { value: '', label: 'All activity' },
-          ...ACTIVITY_TYPES.map((value) => ({ value, label: titleCase(value) })),
-        ]}
+        onChange={changeType}
       />
 
       {loading ? (
-        <Card>
+        <SectionCard>
           <SkeletonList rows={6} />
-        </Card>
+        </SectionCard>
       ) : error ? (
         <ErrorState error={error} onRetry={refetch} />
       ) : items.length === 0 ? (
-        <Card>
+        <SectionCard>
           <EmptyState
             icon={ActivityIcon}
             title={type ? 'Nothing of this type yet' : 'No activity yet'}
@@ -112,9 +113,9 @@ export default function Activity() {
                 : 'Activity appears here as the house gets used - the first expense, chore or settlement will show up.'
             }
           />
-        </Card>
+        </SectionCard>
       ) : (
-        <Card>
+        <SectionCard>
           <ol className="space-y-0">
             {items.map((item) => {
               const tone = toneFor(item.type);
@@ -154,7 +155,7 @@ export default function Activity() {
               );
             })}
           </ol>
-        </Card>
+        </SectionCard>
       )}
 
       {!loading && !error && <Pagination meta={meta} onChange={goToPage} />}

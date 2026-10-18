@@ -21,9 +21,24 @@ import {
 
 /** Gold, silver, bronze - the only place in the app that gets to be loud. */
 const MEDALS = {
-  1: { plinth: 'bg-gold/20', text: 'text-gold', ring: 'ring-2 ring-gold/50' },
-  2: { plinth: 'bg-surface-muted', text: 'text-muted', ring: 'ring-2 ring-border' },
-  3: { plinth: 'bg-warning-soft', text: 'text-warning', ring: 'ring-2 ring-warning/40' },
+  1: {
+    plinth: 'bg-gradient-to-b from-gold/30 to-gold/5 border border-gold/40',
+    text: 'text-gold',
+    ring: 'ring-2 ring-gold/70 shadow-glow-gold',
+    chip: 'bg-gold/20 text-gold ring-1 ring-gold/40',
+  },
+  2: {
+    plinth: 'bg-gradient-to-b from-surface-raised to-surface-muted border border-border',
+    text: 'text-foreground',
+    ring: 'ring-2 ring-border',
+    chip: 'bg-surface-muted text-muted ring-1 ring-border',
+  },
+  3: {
+    plinth: 'bg-gradient-to-b from-warning/25 to-warning/5 border border-warning/30',
+    text: 'text-warning',
+    ring: 'ring-2 ring-warning/50',
+    chip: 'bg-warning-soft text-warning ring-1 ring-warning/40',
+  },
 };
 
 /**
@@ -48,7 +63,7 @@ export default function Leaderboard() {
 
   if (loading) {
     return (
-      <div className="space-y-5">
+      <div className="page-stagger space-y-5">
         {header}
         <Card>
           <SkeletonList rows={3} />
@@ -60,7 +75,7 @@ export default function Leaderboard() {
 
   if (error) {
     return (
-      <div className="space-y-5">
+      <div className="page-stagger space-y-5">
         {header}
         <ErrorState error={error} onRetry={refetch} />
       </div>
@@ -73,7 +88,7 @@ export default function Leaderboard() {
   // A leaderboard of one is not a leaderboard - encourage the user to fill it.
   if (entries.length <= 1) {
     return (
-      <div className="space-y-5">
+      <div className="page-stagger space-y-5">
         {header}
 
         <Card>
@@ -101,30 +116,36 @@ export default function Leaderboard() {
       key: 'rank',
       header: 'Rank',
       align: 'center',
-      cell: (row) => (
-        <span className={cn('tabular text-sm font-semibold', MEDALS[row.rank]?.text || 'text-muted')}>
-          {row.rank}
-        </span>
-      ),
+      cell: (row) => {
+        const medal = MEDALS[row.rank];
+
+        return (
+          <span
+            className={cn(
+              'tabular inline-flex h-7 w-7 items-center justify-center rounded-full font-display text-sm font-semibold',
+              medal?.chip || 'text-muted',
+            )}
+          >
+            {row.rank}
+          </span>
+        );
+      },
     },
     {
       key: 'member',
       header: 'Member',
       mobilePrimary: true,
       cell: (row) => (
-        <div className="flex items-center gap-2.5">
+        <div className="flex min-w-0 items-center gap-2.5">
           <Avatar src={row.avatarUrl} name={row.name} size="sm" />
-          <div className="min-w-0">
-            <p className="flex items-center gap-1.5 truncate text-sm font-medium text-foreground">
-              {row.name}
-              {row._id === user?._id && (
-                <Badge tone="primary" size="sm">
-                  You
-                </Badge>
-              )}
-            </p>
-            {row._id === user?._id && <p className="text-2xs text-muted">This is your row</p>}
-          </div>
+          <p className="flex min-w-0 items-center gap-1.5 text-sm font-medium text-foreground">
+            <span className="truncate">{row.name}</span>
+            {row._id === user?._id && (
+              <Badge tone="primary" size="sm">
+                You
+              </Badge>
+            )}
+          </p>
         </div>
       ),
     },
@@ -145,24 +166,29 @@ export default function Leaderboard() {
       header: 'XP',
       align: 'right',
       mobileLabel: 'XP',
-      cell: (row) => <span className="tabular text-sm font-semibold text-gold">{row.xp} XP</span>,
+      cell: (row) => <span className="tabular font-display text-sm font-semibold text-gold">{row.xp} XP</span>,
     },
   ];
 
   return (
-    <div className="space-y-5">
+    <div className="page-stagger space-y-5">
       <PageHeader
         title="Leaderboard"
         description={`${pluralise(totalMembers, 'member')} in the house, ranked by XP.`}
       />
 
-      <Card>
-        <div className="mb-4 flex items-center justify-center gap-2 text-sm font-medium text-foreground">
+      <Card className="relative overflow-hidden">
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-24 left-1/2 h-52 w-52 -translate-x-1/2 rounded-full bg-gold/15 blur-3xl"
+        />
+
+        <div className="relative mb-5 flex items-center justify-center gap-2 text-sm font-medium text-foreground">
           <Trophy className="h-4 w-4 text-gold" aria-hidden="true" />
           Top of the house
         </div>
 
-        <div className="grid grid-cols-3 items-end gap-2 sm:gap-4">
+        <div className="relative grid grid-cols-3 items-end gap-2 pt-2 sm:gap-4">
           {second ? <PodiumColumn entry={second} place={2} /> : <div aria-hidden="true" />}
           {first ? <PodiumColumn entry={first} place={1} /> : <div aria-hidden="true" />}
           {third ? <PodiumColumn entry={third} place={3} /> : <div aria-hidden="true" />}
@@ -173,7 +199,7 @@ export default function Leaderboard() {
         columns={columns}
         rows={entries}
         rowClassName={(row) => (row._id === user?._id ? 'bg-primary-soft/60' : undefined)}
-        className="sm:rounded-xl sm:border sm:border-border sm:bg-surface sm:p-4 sm:shadow-card"
+        className="sm:rounded-2xl sm:border sm:border-border sm:bg-surface sm:p-4 sm:shadow-card"
       />
 
       <TieBreakCard />
@@ -190,7 +216,23 @@ function PodiumColumn({ entry, place }) {
 
   return (
     <div className="flex flex-col items-center gap-1.5">
-      <Avatar src={entry.avatarUrl} name={entry.name} size={place === 1 ? 'lg' : 'md'} className={medal.ring} />
+      <div className="relative">
+        <Avatar
+          src={entry.avatarUrl}
+          name={entry.name}
+          size={place === 1 ? 'lg' : 'md'}
+          className={medal.ring}
+        />
+
+        {place === 1 && (
+          <span
+            className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-gradient-gold text-white shadow-glow-gold"
+            aria-hidden="true"
+          >
+            <Trophy className="h-3 w-3" />
+          </span>
+        )}
+      </div>
 
       <p className="w-full truncate text-center text-xs font-medium text-foreground">{entry.name}</p>
       <p className="tabular text-2xs text-muted">
@@ -199,12 +241,12 @@ function PodiumColumn({ entry, place }) {
 
       <div
         className={cn(
-          'flex w-full items-center justify-center rounded-t-xl',
+          'flex w-full items-center justify-center rounded-t-2xl',
           medal.plinth,
-          place === 1 ? 'h-20' : 'h-14',
+          place === 1 ? 'h-24 sm:h-28' : 'h-16 sm:h-20',
         )}
       >
-        <span className={cn('tabular text-lg font-bold', medal.text)}>{place}</span>
+        <span className={cn('tabular font-display text-xl font-bold', medal.text)}>{place}</span>
       </div>
     </div>
   );

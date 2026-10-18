@@ -31,7 +31,7 @@ export function SkeletonCards({ count = 4, className }) {
   return (
     <div className={cn('grid gap-4 sm:grid-cols-2 lg:grid-cols-4', className)} aria-hidden="true">
       {Array.from({ length: count }).map((_, index) => (
-        <div key={index} className="rounded-xl border border-border bg-surface p-5">
+        <div key={index} className="card p-5">
           <Skeleton className="h-3 w-24" />
           <Skeleton className="mt-3 h-7 w-32" />
           <Skeleton className="mt-3 h-3 w-20" />

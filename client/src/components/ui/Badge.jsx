@@ -32,7 +32,12 @@ export default function Badge({ tone = 'neutral', size = 'md', icon: Icon, dot =
         className,
       )}
     >
-      {dot && <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />}
+      {dot && (
+        <span className="relative flex h-1.5 w-1.5" aria-hidden="true">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-current opacity-60" />
+          <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-current" />
+        </span>
+      )}
       {Icon && <Icon aria-hidden="true" style={{ width: 12, height: 12 }} />}
       {children}
     </span>

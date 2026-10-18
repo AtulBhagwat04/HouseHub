@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Bell, Activity, Eye, KeyRound, Monitor, Moon, ShieldCheck, Sun, Trash2 } from 'lucide-react';
+import { Bell, Eye, KeyRound, Monitor, Moon, ShieldCheck, Sun, Trash2 } from 'lucide-react';
 import * as authService from '@/services/authService';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
@@ -8,7 +8,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { useDocumentTitle } from '@/hooks';
 import { THEME_OPTIONS } from '@/lib/catalogue';
 import { titleCase } from '@/lib/format';
-import { Badge, Button, Card, Checkbox, PageHeader, SectionCard, Tabs } from '@/components/ui';
+import { Badge, Button, Checkbox, PageHeader, SectionCard, Tabs } from '@/components/ui';
 
 const THEME_ICONS = { light: Sun, dark: Moon, system: Monitor };
 
@@ -97,7 +97,7 @@ export default function Settings() {
   }
 
   return (
-    <div className="space-y-5">
+    <div className="page-stagger space-y-5">
       <PageHeader
         breadcrumbs={[{ label: 'Dashboard', to: '/dashboard' }, { label: 'Settings' }]}
         title="Settings"
@@ -120,8 +120,7 @@ export default function Settings() {
         </div>
 
         <p className="mt-3 text-xs text-muted">
-          Showing {resolved} right now. This preference is saved to your account, so it follows you to any device
-          you sign in on.
+          Showing {resolved} right now. Saved to your account, so it follows you to every device.
         </p>
       </SectionCard>
 
@@ -134,6 +133,7 @@ export default function Settings() {
           {Object.entries(PREFERENCE_COPY).map(([key, copy]) => (
             <Checkbox
               key={key}
+              variant="switch"
               label={copy.label}
               description={copy.description}
               checked={Boolean(prefs[key])}
@@ -151,9 +151,9 @@ export default function Settings() {
 
       {/* House ---------------------------------------------------------- */}
       <SectionCard title="House" description="Shared settings do not live here.">
-        <p className="text-sm text-muted">
-          The house name, invite rules and the weekly chore goal belong to everyone you live with, so they are
-          edited on the house pages rather than on your own account.
+        <p className="text-sm text-muted text-pretty">
+          The house name, invite rules and weekly chore goal belong to everyone, so they are edited on the
+          house pages rather than on your own account.
         </p>
 
         <div className="mt-4">
@@ -177,7 +177,7 @@ export default function Settings() {
               to="/profile"
               className="flex items-center gap-3 py-3 transition hover:opacity-80"
             >
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-soft text-primary">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-primary">
                 <KeyRound className="h-4 w-4" aria-hidden="true" />
               </span>
 
@@ -194,7 +194,7 @@ export default function Settings() {
 
           <li>
             <Link to="/profile" className="flex items-center gap-3 py-3 transition hover:opacity-80">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-error-soft text-error">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-error-soft text-error">
                 <Trash2 className="h-4 w-4" aria-hidden="true" />
               </span>
 
@@ -214,21 +214,11 @@ export default function Settings() {
       </SectionCard>
 
       {/* About --------------------------------------------------------- */}
-      <Card>
-        <div className="flex items-start gap-3">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-primary">
-            <Activity className="h-5 w-5" aria-hidden="true" />
-          </span>
-
-          <div className="min-w-0 flex-1">
-            <h2 className="text-base font-semibold text-foreground">HOUSEHUB</h2>
-            <p className="mt-0.5 text-sm text-muted">
-              Shared-house expenses, chores and balances. Version {APP_VERSION}, built on MongoDB, Express,
-              React and Node.
-            </p>
-          </div>
-        </div>
-      </Card>
+      <SectionCard title="HOUSEHUB" description="Shared-house expenses, chores and balances.">
+        <p className="text-xs text-muted">
+          Version {APP_VERSION}, built on MongoDB, Express, React and Node.
+        </p>
+      </SectionCard>
     </div>
   );
 }

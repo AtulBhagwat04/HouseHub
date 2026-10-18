@@ -62,7 +62,7 @@ export default function ChoreEdit() {
 
   if (loading || membersLoading) {
     return (
-      <div className="space-y-5">
+      <div className="page-stagger space-y-5">
         {header}
         <Card className="space-y-4">
           <Skeleton className="h-10 w-full" />
@@ -78,7 +78,7 @@ export default function ChoreEdit() {
   if (error || membersError) {
     const failure = error || membersError;
     return (
-      <div className="space-y-5">
+      <div className="page-stagger space-y-5">
         {header}
         <ErrorState error={failure} onRetry={refetch} />
       </div>
@@ -87,7 +87,7 @@ export default function ChoreEdit() {
 
   if (!chore) {
     return (
-      <div className="space-y-5">
+      <div className="page-stagger space-y-5">
         {header}
         <ErrorState error={{ status: 404, message: 'That chore no longer exists.' }} />
       </div>
@@ -104,20 +104,27 @@ export default function ChoreEdit() {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="page-stagger space-y-5">
       {header}
 
-      <Card>
-        <ChoreForm
-          mode="edit"
-          initialValues={initialValues}
-          members={members}
-          submitting={submitting}
-          onSubmit={handleSubmit}
-          submitLabel="Save changes"
-          fieldErrors={fieldErrors}
-          onCancel={() => navigate(`/chores/${choreId}`)}
+      <Card className="relative overflow-hidden">
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-primary/10 blur-3xl"
         />
+
+        <div className="relative">
+          <ChoreForm
+            mode="edit"
+            initialValues={initialValues}
+            members={members}
+            submitting={submitting}
+            onSubmit={handleSubmit}
+            submitLabel="Save changes"
+            fieldErrors={fieldErrors}
+            onCancel={() => navigate(`/chores/${choreId}`)}
+          />
+        </div>
       </Card>
     </div>
   );

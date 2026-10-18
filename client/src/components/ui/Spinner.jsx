@@ -1,4 +1,3 @@
-import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/cn';
 
 const SIZES = {
@@ -8,8 +7,30 @@ const SIZES = {
   lg: 'h-9 w-9',
 };
 
+const RING = {
+  xs: 'border-[1.5px]',
+  sm: 'border-2',
+  md: 'border-2',
+  lg: 'border-[3px]',
+};
+
+/** Gradient ring spinner - two stacked borders with only the top edge lit. */
 export function Spinner({ size = 'md', className }) {
-  return <Loader2 className={cn('animate-spin text-primary', SIZES[size], className)} aria-hidden="true" />;
+  return (
+    <span
+      role="status"
+      aria-label="Loading"
+      className={cn('relative inline-flex shrink-0', SIZES[size], className)}
+    >
+      <span className={cn('absolute inset-0 rounded-full border-primary/20', RING[size])} />
+      <span
+        className={cn(
+          'absolute inset-0 animate-spin rounded-full border-transparent border-t-primary border-r-primary/60',
+          RING[size],
+        )}
+      />
+    </span>
+  );
 }
 
 /** Centred spinner with optional caption - the default page/section loading state. */

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CalendarClock } from 'lucide-react';
+import { CalendarClock, CheckCircle2, Zap } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/cn';
 import {
@@ -9,7 +9,7 @@ import {
   XP_REWARDS,
 } from '@/lib/catalogue';
 import { todayInputValue } from '@/lib/format';
-import { Avatar, Button, Input, Select, Tabs, Textarea } from '@/components/ui';
+import { Avatar, Badge, Button, Input, Select, Tabs, Textarea } from '@/components/ui';
 
 /** Only the create flow needs a default assignee - edit always has a stored one. */
 function initialState(mode, initialValues, currentUserId) {
@@ -109,36 +109,38 @@ export default function ChoreForm({
 
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-5">
-      <Input
-        label="Chore"
-        name="title"
-        placeholder="Wash the dishes"
-        maxLength={80}
-        value={form.title}
-        onChange={(event) => setField('title', event.target.value)}
-        error={errorFor('title')}
-        required
-      />
+      <FormSection title="What needs doing">
+        <Input
+          label="Chore"
+          name="title"
+          placeholder="Wash the dishes"
+          maxLength={80}
+          value={form.title}
+          onChange={(event) => setField('title', event.target.value)}
+          error={errorFor('title')}
+          required
+        />
 
-      <Textarea
-        label="Description"
-        name="description"
-        rows={3}
-        placeholder="Anything the person doing it should know"
-        maxLength={500}
-        value={form.description}
-        onChange={(event) => setField('description', event.target.value)}
-        error={errorFor('description')}
-      />
+        <Textarea
+          label="Description"
+          name="description"
+          rows={3}
+          placeholder="Anything the person doing it should know"
+          maxLength={500}
+          value={form.description}
+          onChange={(event) => setField('description', event.target.value)}
+          error={errorFor('description')}
+        />
+      </FormSection>
 
-      <MemberPicker
-        members={members}
-        value={form.assignedTo}
-        onChange={(value) => setField('assignedTo', value)}
-        error={errorFor('assignedTo')}
-      />
+      <FormSection title="Who, when and what it is worth">
+        <MemberPicker
+          members={members}
+          value={form.assignedTo}
+          onChange={(value) => setField('assignedTo', value)}
+          error={errorFor('assignedTo')}
+        />
 
-      <div className="grid gap-4 sm:grid-cols-2">
         <Input
           label="Due date"
           name="dueDate"
@@ -150,53 +152,92 @@ export default function ChoreForm({
           required
         />
 
-        <Select
-          label="XP reward"
-          name="xpReward"
-          value={String(form.xpReward)}
-          onChange={(event) => changeReward(event.target.value)}
-          options={XP_REWARDS.map((reward) => ({ value: String(reward), label: `+${reward} XP` }))}
-          error={errorFor('xpReward')}
-          // The reward belongs to the assignee, even when a manager ticks the
-          // chore off on their behalf.
-          hint="Credited to the person the chore is assigned to when it is completed, not to whoever ticks it off."
-        />
-      </div>
+        {/* Difficulty and reward share the gold treatment so the two halves of
+            "what this is worth" read as one decision. */}
+        <div className="space-y-4 rounded-2xl border border-gold/25 bg-gold/[0.05] p-3.5">
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-gold text-white shadow-glow-gold">
+              <Zap className="h-4 w-4" aria-hidden="true" />
+            </span>
 
-      <div className="flex flex-col gap-1.5">
-        <span className="text-sm font-medium text-foreground">Priority</span>
+            <p className="font-display text-sm font-semibold text-foreground">Difficulty &amp; reward</p>
 
-        <Tabs
-          variant="pills"
-          size="sm"
-          className="w-fit"
-          value={form.priority}
-          onChange={changePriority}
-          tabs={CHORE_PRIORITIES.map((priority) => ({
-            value: priority,
-            label: PRIORITY_STYLES[priority]?.label || priority,
-          }))}
-        />
+            <Badge tone="gold" className="tabular ml-auto">
+              +{form.xpReward} XP
+            </Badge>
+          </div>
 
-        {errorFor('priority') && (
-          <p role="alert" className="text-xs text-error">
-            {errorFor('priority')}
-          </p>
-        )}
-      </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="flex min-w-0 flex-col gap-1.5">
+              <span className="text-sm font-medium text-foreground">Priority</span>
 
-      <div className="flex flex-wrap items-center gap-2 border-t border-border pt-4">
-        <Button type="submit" loading={submitting}>
-          {submitLabel}
-        </Button>
+              <Tabs
+                variant="pills"
+                size="sm"
+                className="w-fit max-w-full"
+                value={form.priority}
+                onChange={changePriority}
+                tabs={CHORE_PRIORITIES.map((priority) => ({
+                  value: priority,
+                  label: PRIORITY_STYLES[priority]?.label || priority,
+                }))}
+              />
 
+              {errorFor('priority') && (
+                <p role="alert" className="text-xs text-error">
+                  {errorFor('priority')}
+                </p>
+              )}
+            </div>
+
+            <Select
+              label="XP reward"
+              name="xpReward"
+              value={String(form.xpReward)}
+              onChange={(event) => changeReward(event.target.value)}
+              options={XP_REWARDS.map((reward) => ({ value: String(reward), label: `+${reward} XP` }))}
+              error={errorFor('xpReward')}
+              // The reward belongs to the assignee, even when a manager ticks the
+              // chore off on their behalf.
+              hint="Credited to the person the chore is assigned to when it is completed, not to whoever ticks it off."
+            />
+          </div>
+        </div>
+      </FormSection>
+
+      <div className="flex flex-col-reverse gap-2 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-end">
         {onCancel && (
-          <Button type="button" variant="ghost" onClick={onCancel} disabled={submitting}>
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={onCancel}
+            disabled={submitting}
+            className="w-full sm:w-auto"
+          >
             Cancel
           </Button>
         )}
+
+        <Button type="submit" loading={submitting} className="w-full sm:w-auto">
+          {submitLabel}
+        </Button>
       </div>
     </form>
+  );
+}
+
+/**
+ * A titled group of fields.
+ *
+ * These sit inside the page's `Card`, so they use `card-solid` rather than a
+ * second glass surface: stacked backdrop blur turns muddy.
+ */
+function FormSection({ title, children }) {
+  return (
+    <section className="card-solid p-4 sm:p-5">
+      <h2 className="font-display text-base font-semibold text-foreground">{title}</h2>
+      <div className="mt-4 space-y-4">{children}</div>
+    </section>
   );
 }
 
@@ -209,7 +250,7 @@ export default function ChoreForm({
  */
 function MemberPicker({ members, value, onChange, error }) {
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex min-w-0 flex-col gap-1.5">
       <span className="text-sm font-medium text-foreground">
         Assigned to
         <span className="ml-0.5 text-error" aria-hidden="true">
@@ -229,10 +270,10 @@ function MemberPicker({ members, value, onChange, error }) {
               aria-checked={selected}
               onClick={() => onChange(member._id)}
               className={cn(
-                'flex items-center gap-2.5 rounded-lg border px-3 py-2.5 text-left transition',
+                'flex items-center gap-2.5 rounded-xl border px-3 py-2.5 text-left transition active:scale-[0.99]',
                 selected
-                  ? 'border-primary bg-primary-soft'
-                  : 'border-border bg-surface hover:bg-surface-muted',
+                  ? 'border-primary/60 bg-primary-soft ring-1 ring-primary/25'
+                  : 'border-border bg-surface-muted/25 hover:border-primary/30 hover:bg-primary/[0.04]',
               )}
             >
               <Avatar src={member.avatarUrl} name={member.name} size="sm" />
@@ -243,10 +284,12 @@ function MemberPicker({ members, value, onChange, error }) {
                 >
                   {member.name}
                 </span>
-                <span className="block text-2xs text-muted">
+                <span className="tabular block text-2xs text-muted">
                   Lv {member.level} &middot; {member.xp} XP
                 </span>
               </span>
+
+              {selected && <CheckCircle2 className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />}
             </button>
           );
         })}

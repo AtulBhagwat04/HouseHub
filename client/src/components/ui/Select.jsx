@@ -32,7 +32,7 @@ const Select = forwardRef(function Select(
 ) {
   const autoId = useId();
   const fieldId = id || autoId;
-  const sizeClasses = size === 'lg' ? 'h-11 text-base' : size === 'sm' ? 'h-9 text-sm' : '';
+  const sizeClasses = size === 'lg' ? 'h-12 text-base' : size === 'sm' ? 'h-9 text-sm' : 'h-11';
 
   return (
     <FormField
@@ -52,7 +52,7 @@ const Select = forwardRef(function Select(
           className={cn(
             controlClasses({ error }),
             sizeClasses,
-            'cursor-pointer appearance-none pr-9',
+            'cursor-pointer appearance-none pr-10 font-medium',
             className,
           )}
           {...rest}
@@ -70,10 +70,9 @@ const Select = forwardRef(function Select(
           {children}
         </select>
 
-        <ChevronDown
-          className="pointer-events-none absolute right-3 h-4 w-4 text-muted"
-          aria-hidden="true"
-        />
+        <span className="pointer-events-none absolute right-3 flex h-6 w-6 items-center justify-center rounded-md bg-surface-muted text-muted">
+          <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
+        </span>
       </div>
     </FormField>
   );

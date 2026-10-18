@@ -22,7 +22,6 @@ import { formatCurrency, formatRelativeTime } from '@/lib/format';
 import {
   Badge,
   Button,
-  Card,
   CategoryIcon,
   ConfirmDialog,
   DataTable,
@@ -32,6 +31,7 @@ import {
   Input,
   PageHeader,
   Pagination,
+  SectionCard,
   Select,
   SkeletonCards,
   StatCard,
@@ -241,7 +241,7 @@ export default function Expenses() {
   ];
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 page-stagger">
       <PageHeader
         title="Expenses"
         description="Every bill the house has shared, and who paid for it."
@@ -279,7 +279,16 @@ export default function Expenses() {
         </div>
       )}
 
-      <Card>
+      <SectionCard
+        title="Filters"
+        action={
+          hasFilters ? (
+            <Button variant="ghost" size="sm" icon={RotateCcw} onClick={clearFilters}>
+              Clear filters
+            </Button>
+          ) : null
+        }
+      >
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <Input
             label="Search"
@@ -314,50 +323,43 @@ export default function Expenses() {
             onChange={(event) => setParam('sort', event.target.value)}
           />
         </div>
-
-        {hasFilters && (
-          <div className="mt-3 flex justify-end">
-            <Button variant="ghost" size="sm" icon={RotateCcw} onClick={clearFilters}>
-              Clear filters
-            </Button>
-          </div>
-        )}
-      </Card>
+      </SectionCard>
 
       {error ? (
         <ErrorState error={error} onRetry={refetch} />
       ) : (
         <>
-          <Card padded={false} className="p-3">
-            <DataTable
-              columns={columns}
-              rows={items}
-              loading={loading}
-              emptyState={
-                <EmptyState
-                  icon={Receipt}
-                  title={hasFilters ? 'No expenses match these filters' : 'No expenses yet'}
-                  description={
-                    hasFilters
-                      ? 'Try a different search, category, member or date range.'
-                      : 'Add the first bill and HOUSEHUB will work out who owes what.'
-                  }
-                  action={
-                    hasFilters ? (
-                      <Button variant="outline" size="sm" icon={RotateCcw} onClick={clearFilters}>
-                        Clear filters
-                      </Button>
-                    ) : (
-                      <Button as={Link} to="/expenses/new" size="sm" icon={Plus}>
-                        Add expense
-                      </Button>
-                    )
-                  }
-                />
-              }
-              footnote={meta ? `Showing ${items.length} of ${meta.total} matching expenses.` : undefined}
-            />
-          </Card>
+          <DataTable
+            columns={columns}
+            rows={items}
+            loading={loading}
+            emptyState={
+              <EmptyState
+                icon={Receipt}
+                title={hasFilters ? 'No expenses match these filters' : 'No expenses yet'}
+                description={
+                  hasFilters
+                    ? 'Try a different search, category, member or date range.'
+                    : 'Add the first bill and HOUSEHUB will work out who owes what.'
+                }
+                action={
+                  hasFilters ? (
+                    <Button variant="outline" size="sm" icon={RotateCcw} onClick={clearFilters}>
+                      Clear filters
+                    </Button>
+                  ) : (
+                    <Button as={Link} to="/expenses/new" size="sm" icon={Plus}>
+                      Add expense
+                    </Button>
+                  )
+                }
+              />
+            }
+            footnote={meta ? `Showing ${items.length} of ${meta.total} matching expenses.` : undefined}
+            // No outer card on phones - the stacked rows already look like
+            // cards, and nesting them would double up the borders.
+            className="sm:rounded-xl sm:border sm:border-border sm:bg-surface sm:p-4 sm:shadow-card"
+          />
 
           <Pagination meta={meta} onChange={(page) => setParam('page', String(page))} itemLabel="expense" />
         </>

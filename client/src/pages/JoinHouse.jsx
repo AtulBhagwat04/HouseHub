@@ -8,8 +8,7 @@ import { useToast } from '@/context/ToastContext';
 import { useDocumentTitle } from '@/hooks';
 import AuthLayout from '@/layouts/AuthLayout';
 import Splash from '@/components/Splash';
-import Button from '@/components/ui/Button';
-import Input from '@/components/ui/Input';
+import { Button, Card, Input } from '@/components/ui';
 
 /**
  * Invite-link landing.
@@ -71,13 +70,13 @@ export default function JoinHouse() {
 
     return (
       <AuthLayout>
-        <div className="space-y-6">
-          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-soft text-primary">
+        <Card className="space-y-5">
+          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-soft text-primary">
             <Home className="h-6 w-6" aria-hidden="true" />
           </span>
 
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-foreground">You have been invited</h1>
+            <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">You have been invited</h1>
             <p className="mt-1 text-sm text-muted">
               {initialCode ? (
                 <>
@@ -102,11 +101,11 @@ export default function JoinHouse() {
           </div>
 
           <p className="text-center text-sm text-muted">
-            <Link to="/" className="font-medium text-primary hover:underline">
+            <Link to="/" className="font-medium text-primary transition hover:underline">
               Back to home
             </Link>
           </p>
-        </div>
+        </Card>
       </AuthLayout>
     );
   }
@@ -115,9 +114,9 @@ export default function JoinHouse() {
   if (hasHouse) {
     return (
       <AuthLayout>
-        <div className="space-y-6">
+        <Card className="space-y-5">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-foreground">You are already in a house</h1>
+            <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">You are already in a house</h1>
             <p className="mt-1 text-sm text-muted">
               HOUSEHUB supports one house per account. Leave your current house before joining another.
             </p>
@@ -126,7 +125,7 @@ export default function JoinHouse() {
           <Button as={Link} to="/dashboard" fullWidth size="lg" icon={ArrowLeft}>
             Back to dashboard
           </Button>
-        </div>
+        </Card>
       </AuthLayout>
     );
   }
@@ -134,13 +133,13 @@ export default function JoinHouse() {
   /* Ready to join ------------------------------------------------------ */
   return (
     <AuthLayout>
-      <div className="space-y-6">
-        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-soft text-primary">
+      <Card className="space-y-5">
+        <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-soft text-primary">
           <Home className="h-6 w-6" aria-hidden="true" />
         </span>
 
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Join your house</h1>
+          <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">Join your house</h1>
           <p className="mt-1 text-sm text-muted">
             Signed in as {user?.email || user?.name}. Confirm the invite code to join.
           </p>
@@ -166,11 +165,11 @@ export default function JoinHouse() {
         </form>
 
         <p className="text-center text-sm text-muted">
-          <Link to="/onboarding" className="font-medium text-primary hover:underline">
+          <Link to="/onboarding" className="font-medium text-primary transition hover:underline">
             Create your own house instead
           </Link>
         </p>
-      </div>
+      </Card>
     </AuthLayout>
   );
 }

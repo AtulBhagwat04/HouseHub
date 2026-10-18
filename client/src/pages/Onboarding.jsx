@@ -6,10 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
 import { useDocumentTitle } from '@/hooks';
 import { HOUSE_NAME_MAX } from '@shared/constants.js';
-import Button from '@/components/ui/Button';
-import Input from '@/components/ui/Input';
-import Textarea from '@/components/ui/Textarea';
-import Tabs from '@/components/ui/Tabs';
+import { Button, Card, Input, Tabs, Textarea } from '@/components/ui';
 
 /**
  * First-run screen for a signed-in user with no house.
@@ -90,7 +87,7 @@ export default function Onboarding() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+        <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
           Welcome, {user?.name?.split(' ')[0] || 'housemate'}
         </h1>
         <p className="mt-1 text-sm text-muted">
@@ -98,89 +95,91 @@ export default function Onboarding() {
         </p>
       </div>
 
-      <Tabs
-        variant="pills"
-        className="w-full"
-        value={tab}
-        onChange={setTab}
-        tabs={[
-          { value: 'create', label: 'Create a house', icon: Plus },
-          { value: 'join', label: 'Join a house', icon: LogIn },
-        ]}
-      />
+      <Card className="space-y-4">
+        <Tabs
+          variant="pills"
+          className="w-full"
+          value={tab}
+          onChange={setTab}
+          tabs={[
+            { value: 'create', label: 'Create a house', icon: Plus },
+            { value: 'join', label: 'Join a house', icon: LogIn },
+          ]}
+        />
 
-      {tab === 'create' ? (
-        <form onSubmit={handleCreate} noValidate className="space-y-4">
-          {createError && (
-            <div role="alert" className="rounded-lg border border-error/30 bg-error-soft px-3.5 py-2.5 text-sm text-error">
-              {createError}
-            </div>
-          )}
+        {tab === 'create' ? (
+          <form onSubmit={handleCreate} noValidate className="space-y-4">
+            {createError && (
+              <div role="alert" className="animate-fade-in rounded-xl border border-error/30 bg-error-soft px-3.5 py-2.5 text-sm text-error">
+                {createError}
+              </div>
+            )}
 
-          <Input
-            label="House name"
-            name="name"
-            placeholder="College Flat"
-            value={createForm.name}
-            maxLength={HOUSE_NAME_MAX}
-            onChange={(event) => {
-              setCreateForm((current) => ({ ...current, name: event.target.value }));
-              setCreateErrors({});
-              setCreateError('');
-            }}
-            error={createErrors.name}
-            hint={!createErrors.name ? 'Something your housemates will recognise.' : undefined}
-            required
-          />
+            <Input
+              label="House name"
+              name="name"
+              placeholder="College Flat"
+              value={createForm.name}
+              maxLength={HOUSE_NAME_MAX}
+              onChange={(event) => {
+                setCreateForm((current) => ({ ...current, name: event.target.value }));
+                setCreateErrors({});
+                setCreateError('');
+              }}
+              error={createErrors.name}
+              hint={!createErrors.name ? 'Something your housemates will recognise.' : undefined}
+              required
+            />
 
-          <Input
-            label="Location"
-            name="location"
-            placeholder="Koramangala, Bengaluru"
-            value={createForm.location}
-            onChange={(event) => setCreateForm((current) => ({ ...current, location: event.target.value }))}
-            hint="Optional. Helps if you have more than one place."
-          />
+            <Input
+              label="Location"
+              name="location"
+              placeholder="Koramangala, Bengaluru"
+              value={createForm.location}
+              onChange={(event) => setCreateForm((current) => ({ ...current, location: event.target.value }))}
+              hint="Optional. Helps if you have more than one place."
+            />
 
-          <Textarea
-            label="Description"
-            name="description"
-            rows={2}
-            placeholder="Second floor, green gate, buzzer 4B"
-            value={createForm.description}
-            onChange={(event) => setCreateForm((current) => ({ ...current, description: event.target.value }))}
-            hint="Optional."
-          />
+            <Textarea
+              label="Description"
+              name="description"
+              rows={2}
+              placeholder="Second floor, green gate, buzzer 4B"
+              value={createForm.description}
+              onChange={(event) => setCreateForm((current) => ({ ...current, description: event.target.value }))}
+              hint="Optional."
+            />
 
-          <Button type="submit" fullWidth size="lg" icon={Home} loading={creating}>
-            Create house
-          </Button>
-        </form>
-      ) : (
-        <form onSubmit={handleJoin} noValidate className="space-y-4">
-          <Input
-            label="Invite code or link"
-            name="inviteCode"
-            placeholder="HOUSE-7X92A"
-            value={code}
-            onChange={(event) => {
-              setCode(event.target.value);
-              setCodeError('');
-            }}
-            error={codeError}
-            hint={!codeError ? 'Paste the whole link if you have it - we will find the code.' : undefined}
-            required
-          />
+            <Button type="submit" fullWidth size="lg" icon={Home} loading={creating}>
+              Create house
+            </Button>
+          </form>
+        ) : (
+          <form onSubmit={handleJoin} noValidate className="space-y-4">
+            <Input
+              label="Invite code or link"
+              name="inviteCode"
+              placeholder="HOUSE-7X92A"
+              value={code}
+              onChange={(event) => {
+                setCode(event.target.value);
+                setCodeError('');
+              }}
+              error={codeError}
+              hint={!codeError ? 'Paste the whole link if you have it - we will find the code.' : undefined}
+              required
+            />
 
-          <Button type="submit" fullWidth size="lg" icon={LogIn} loading={joining}>
-            Join house
-          </Button>
+            <Button type="submit" fullWidth size="lg" icon={LogIn} loading={joining}>
+              Join house
+            </Button>
 
-          <p className="text-center text-xs text-muted">
-            Ask a housemate for the code, or open the invite link they sent you.
-          </p>
-        </form>
-      )}
+            <p className="text-center text-xs text-muted">
+              Ask a housemate for the code, or open the invite link they sent you.
+            </p>
+          </form>
+        )}
+      </Card>
     </div>
   );
 }

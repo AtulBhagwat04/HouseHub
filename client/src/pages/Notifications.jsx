@@ -153,7 +153,7 @@ export default function Notifications() {
   }
 
   return (
-    <div className="space-y-5">
+    <div className="page-stagger space-y-5">
       <PageHeader
         breadcrumbs={[{ label: 'Dashboard', to: '/dashboard' }, { label: 'Notifications' }]}
         title="Notifications"
@@ -247,23 +247,30 @@ export default function Notifications() {
                       (lookup.tone === 'primary' || lookup.tone === 'neutral') && 'bg-primary-soft text-primary',
                     )}
                   >
-                    <Icon className="h-4.5 w-4.5" style={{ width: 18, height: 18 }} aria-hidden="true" />
+                    <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
                   </span>
                 )}
 
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <p className="min-w-0 truncate text-sm font-semibold text-foreground">{item.title}</p>
+                    <p
+                      className={cn(
+                        'min-w-0 truncate text-sm text-foreground',
+                        item.read ? 'font-medium' : 'font-semibold',
+                      )}
+                    >
+                      {item.title}
+                    </p>
                     {!item.read && <span className="h-2 w-2 shrink-0 rounded-full bg-primary" aria-hidden="true" />}
                   </div>
 
-                  {item.message && <p className="mt-0.5 text-sm text-muted">{item.message}</p>}
+                  {item.message && <p className="mt-0.5 text-sm text-muted text-pretty">{item.message}</p>}
 
                   <div className="mt-1.5 flex flex-wrap items-center gap-2">
                     <Badge tone={lookup.tone} size="sm">
                       {titleCase(item.type)}
                     </Badge>
-                    <span className="text-2xs text-muted">{formatRelativeTime(item.createdAt)}</span>
+                    <span className="tabular text-2xs text-muted">{formatRelativeTime(item.createdAt)}</span>
                   </div>
                 </div>
               </>
@@ -273,10 +280,14 @@ export default function Notifications() {
               <li
                 key={item._id}
                 className={cn(
-                  'rounded-xl border shadow-card',
-                  item.read ? 'border-border bg-surface' : 'border-primary/25 bg-primary-soft/40',
+                  'relative overflow-hidden rounded-2xl border shadow-card transition',
+                  item.read ? 'border-border bg-surface/70' : 'border-primary/30 bg-primary-soft/40',
                 )}
               >
+                {!item.read && (
+                  <span aria-hidden="true" className="absolute inset-y-0 left-0 w-0.5 bg-brand-gradient" />
+                )}
+
                 <div className="flex items-start gap-2 p-3.5">
                   {item.link ? (
                     // A real button, so keyboard users get the same click target as
@@ -294,7 +305,7 @@ export default function Notifications() {
 
                   <Button
                     variant="ghost"
-                    size="icon-sm"
+                    size="icon"
                     disabled={deletingId === item._id}
                     onClick={() => remove(item)}
                     aria-label={`Delete notification: ${item.title}`}

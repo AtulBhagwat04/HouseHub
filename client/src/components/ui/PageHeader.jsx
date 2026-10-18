@@ -16,7 +16,7 @@ export default function PageHeader({
   children,
 }) {
   return (
-    <div className={cn('flex flex-col gap-3', className)}>
+    <div className={cn('animate-slide-up flex flex-col gap-3', className)}>
       {breadcrumbs.length > 0 && (
         <nav aria-label="Breadcrumb" className="flex items-center gap-1 text-xs text-muted">
           {breadcrumbs.map((crumb, index) => (
@@ -39,15 +39,17 @@ export default function PageHeader({
           {backTo && (
             <Link
               to={backTo}
-              className="mb-1 inline-flex items-center gap-1 text-xs text-muted transition hover:text-foreground"
+              className="mb-1.5 inline-flex items-center gap-1 text-xs text-muted transition hover:text-foreground"
             >
               <ChevronRight className="h-3 w-3 rotate-180" aria-hidden="true" />
               Back
             </Link>
           )}
 
-          <h1 className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">{title}</h1>
-          {description && <p className="mt-1 text-sm text-muted">{description}</p>}
+          <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground sm:text-[1.75rem]">
+            {title}
+          </h1>
+          {description && <p className="mt-1 max-w-2xl text-sm text-muted">{description}</p>}
           {children}
         </div>
 

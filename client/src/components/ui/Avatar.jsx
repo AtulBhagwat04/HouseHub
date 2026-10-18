@@ -4,9 +4,13 @@ import { initialsOf } from '@/lib/format';
 /**
  * Deterministic avatar colour.
  *
- * The same person gets the same colour on every screen and every device because
- * the hue is derived from their name rather than from render order. Keeping the
- * hue list short and the saturation fixed keeps it legible in both themes.
+ * The same person gets the same gradient on every screen and every device
+ * because the hue is derived from their name rather than from render order.
+ *
+ * The fill is a gradient with white initials rather than a tinted disc with
+ * coloured text: a tinted disc has to pick its text colour per theme, whereas a
+ * saturated gradient holds up in both, which keeps this a pure function of the
+ * name with no theme lookup.
  */
 const HUES = [222, 262, 291, 330, 12, 32, 45, 160, 180, 199];
 
@@ -16,6 +20,11 @@ function hueFor(seed = '') {
     hash = (hash * 31 + seed.charCodeAt(index)) % 100000;
   }
   return HUES[hash % HUES.length];
+}
+
+function gradientFor(seed) {
+  const hue = hueFor(seed);
+  return `linear-gradient(135deg, hsl(${hue} 72% 56%) 0%, hsl(${(hue + 42) % 360} 74% 40%) 100%)`;
 }
 
 const SIZES = {
@@ -34,7 +43,6 @@ export default function Avatar({
   className,
   title,
 }) {
-  const hue = hueFor(name || src || '');
   const label = title || name || 'Member';
 
   if (src) {
@@ -58,15 +66,12 @@ export default function Avatar({
       title={label}
       aria-label={label}
       className={cn(
-        'flex shrink-0 items-center justify-center rounded-full font-semibold',
+        'flex shrink-0 items-center justify-center rounded-full font-semibold text-white shadow-sm',
         SIZES[size],
         ring && 'ring-2 ring-surface',
         className,
       )}
-      style={{
-        backgroundColor: `hsl(${hue} 62% 42% / 0.16)`,
-        color: `hsl(${hue} 70% 32%)`,
-      }}
+      style={{ backgroundImage: gradientFor(name || src || '') }}
     >
       {initialsOf(name)}
     </span>

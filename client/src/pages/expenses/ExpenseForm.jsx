@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Receipt } from 'lucide-react';
+import { AlertTriangle, CalendarDays, CheckCircle2, Link2, Receipt } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import {
   EXPENSE_CATEGORIES,
@@ -10,7 +10,19 @@ import {
 } from '@/lib/catalogue';
 import { formatCurrency, formatRupees, parseAmountToPaise, todayInputValue, toRupees } from '@/lib/format';
 import { cn } from '@/lib/cn';
-import { Avatar, Button, Checkbox, FormField, Input, SectionCard, Select, Tabs, Textarea } from '@/components/ui';
+import {
+  Avatar,
+  Badge,
+  Button,
+  Checkbox,
+  FormField,
+  Input,
+  Money,
+  SectionCard,
+  Select,
+  Tabs,
+  Textarea,
+} from '@/components/ui';
 
 /** Stable identity so the error-sync effect in ExpenseForm does not loop. */
 const NO_FIELD_ERRORS = {};
@@ -255,8 +267,12 @@ export default function ExpenseForm({
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-5">
       {formError && (
-        <div role="alert" className="rounded-lg border border-error/30 bg-error-soft px-3.5 py-2.5 text-sm text-error">
-          {formError}
+        <div
+          role="alert"
+          className="animate-fade-in flex items-start gap-2.5 rounded-2xl border border-error/30 bg-error-soft px-4 py-3 text-sm text-error shadow-card"
+        >
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+          <p>{formError}</p>
         </div>
       )}
 
@@ -276,6 +292,7 @@ export default function ExpenseForm({
               label="Amount"
               prefix="₹"
               inputMode="decimal"
+              inputClassName="tabular"
               placeholder="1200"
               value={form.amount}
               onChange={update('amount')}
@@ -296,6 +313,7 @@ export default function ExpenseForm({
             <Input
               label="Date"
               type="date"
+              icon={CalendarDays}
               value={form.date}
               onChange={update('date')}
               error={fieldError('date')}
@@ -315,7 +333,7 @@ export default function ExpenseForm({
           <Textarea
             label="Description"
             rows={3}
-            placeholder="Optional - what this covered"
+            placeholder="What this covered"
             value={form.description}
             onChange={update('description')}
             error={fieldError('description')}
@@ -324,6 +342,7 @@ export default function ExpenseForm({
           <Input
             label="Receipt URL"
             type="url"
+            icon={Link2}
             placeholder="https://..."
             value={form.receiptUrl}
             onChange={update('receiptUrl')}
@@ -333,7 +352,7 @@ export default function ExpenseForm({
         </div>
       </SectionCard>
 
-      <SectionCard title="Split" description="Who shares this expense, and how.">
+      <SectionCard title="Split" description="Who shares it, and how the paise are divided.">
         <div className="space-y-5">
           <Tabs variant="pills" tabs={splitTabs} value={form.splitType} onChange={changeSplitType} />
 
@@ -345,23 +364,35 @@ export default function ExpenseForm({
             hint={!fieldError('participants') ? 'Everyone is included by default.' : undefined}
           >
             <div id="expense-participants" className="grid gap-2 sm:grid-cols-2">
-              {members.map((member) => (
-                <div key={member._id} className="rounded-lg border border-border px-3 py-2">
-                  <Checkbox
-                    checked={form.participants.includes(member._id)}
-                    onChange={() => toggleParticipant(member._id)}
-                    label={
-                      <span className="flex min-w-0 items-center gap-2.5">
-                        <Avatar src={member.avatarUrl} name={member.name} size="sm" />
-                        <span className="min-w-0">
-                          <span className="block truncate text-sm text-foreground">{member.name}</span>
-                          {member._id === user?._id && <span className="block text-2xs text-muted">You</span>}
+              {members.map((member) => {
+                const selected = form.participants.includes(member._id);
+
+                return (
+                  <div
+                    key={member._id}
+                    className={cn(
+                      'rounded-xl border p-3 transition',
+                      selected
+                        ? 'border-primary/50 bg-primary/[0.07]'
+                        : 'border-border bg-surface-muted/25 hover:border-primary/30 hover:bg-primary/[0.04]',
+                    )}
+                  >
+                    <Checkbox
+                      checked={selected}
+                      onChange={() => toggleParticipant(member._id)}
+                      label={
+                        <span className="flex min-w-0 items-center gap-2.5">
+                          <Avatar src={member.avatarUrl} name={member.name} size="sm" />
+                          <span className="min-w-0">
+                            <span className="block truncate text-sm font-medium text-foreground">{member.name}</span>
+                            {member._id === user?._id && <span className="block text-2xs text-muted">You</span>}
+                          </span>
                         </span>
-                      </span>
-                    }
-                  />
-                </div>
-              ))}
+                      }
+                    />
+                  </div>
+                );
+              })}
             </div>
           </FormField>
 
@@ -370,18 +401,22 @@ export default function ExpenseForm({
           ) : (
             <div className="space-y-4">
               {form.splitType !== 'equal' && (
-                <ul className="space-y-2.5">
+                <ul className="space-y-2">
                   {selectedMembers.map((member) => (
-                    <li key={member._id} className="flex items-center gap-2.5">
+                    <li
+                      key={member._id}
+                      className="flex items-center gap-3 rounded-xl border border-border bg-surface-muted/25 px-3 py-2"
+                    >
                       <Avatar src={member.avatarUrl} name={member.name} size="sm" />
                       <span className="min-w-0 flex-1 truncate text-sm text-foreground">{member.name}</span>
 
-                      <div className="w-32 shrink-0">
+                      <div className="w-28 shrink-0 sm:w-32">
                         {form.splitType === 'custom' ? (
                           <Input
                             size="sm"
                             prefix="₹"
                             inputMode="decimal"
+                            inputClassName="tabular"
                             placeholder="0"
                             value={form.shares[member._id] ?? ''}
                             onChange={(event) => updateShare(member._id, event.target.value)}
@@ -392,6 +427,7 @@ export default function ExpenseForm({
                             size="sm"
                             suffix="%"
                             inputMode="decimal"
+                            inputClassName="tabular"
                             placeholder="0"
                             value={form.percentages[member._id] ?? ''}
                             onChange={(event) => updatePercentage(member._id, event.target.value)}
@@ -405,55 +441,95 @@ export default function ExpenseForm({
               )}
 
               {form.splitType === 'custom' && (
-                <p className={cn('tabular text-xs font-medium', customMatches ? 'text-success' : 'text-error')}>
+                <p
+                  className={cn(
+                    'tabular flex items-center gap-1.5 text-xs font-medium',
+                    customMatches ? 'text-success' : 'text-error',
+                  )}
+                >
+                  {customMatches ? (
+                    <CheckCircle2 className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                  ) : (
+                    <AlertTriangle className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                  )}
                   {formatCurrency(customTotal)} of {formatCurrency(amountPaise || 0)} allocated
                   {customMatches ? ' - matches the total' : ' - must match the expense total'}
                 </p>
               )}
 
               {form.splitType === 'percentage' && (
-                <p className={cn('tabular text-xs font-medium', percentageMatches ? 'text-success' : 'text-error')}>
+                <p
+                  className={cn(
+                    'tabular flex items-center gap-1.5 text-xs font-medium',
+                    percentageMatches ? 'text-success' : 'text-error',
+                  )}
+                >
+                  {percentageMatches ? (
+                    <CheckCircle2 className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                  ) : (
+                    <AlertTriangle className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                  )}
                   {Math.round(percentageTotal * 100) / 100}% allocated
                   {percentageMatches ? ' - adds up to 100%' : ' - must add up to 100%'}
                 </p>
               )}
 
-              {previewError ? (
-                <p className="text-sm text-error" role="alert">
-                  {previewError}
-                </p>
-              ) : (
-                preview && (
-                  <div className="overflow-hidden rounded-xl border border-border">
-                    <p className="border-b border-border bg-surface-muted/60 px-3 py-2 text-2xs font-medium uppercase tracking-wide text-muted">
-                      Preview
+              {/* The paise-exact result, anchored so the figures are unmissable. */}
+              <div className="card-solid overflow-hidden">
+                <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-2 border-b border-border bg-primary/[0.04] px-4 py-3.5">
+                  <div className="min-w-0">
+                    <p className="text-2xs font-semibold uppercase tracking-[0.08em] text-muted">Total expense</p>
+                    <p className="tabular text-gradient mt-1.5 font-display text-3xl font-semibold leading-none">
+                      {formatCurrency(amountPaise || 0)}
                     </p>
-                    <ul className="divide-y divide-border">
-                      {selectedMembers.map((member) => (
-                        <li key={member._id} className="flex items-center gap-2.5 px-3 py-2">
-                          <Avatar src={member.avatarUrl} name={member.name} size="xs" />
-                          <span className="min-w-0 flex-1 truncate text-sm text-foreground">{member.name}</span>
-                          <span className="tabular text-sm font-medium text-foreground">
-                            {formatCurrency(shareByUser.get(String(member._id)) ?? 0)}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
                   </div>
-                )
-              )}
+
+                  <Badge tone="neutral">{SPLIT_TYPE_LABELS[form.splitType] || form.splitType}</Badge>
+                </div>
+
+                {previewError ? (
+                  <p role="alert" className="flex items-start gap-2 px-4 py-3 text-sm text-error">
+                    <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                    <span>{previewError}</span>
+                  </p>
+                ) : preview ? (
+                  <ul className="divide-y divide-border">
+                    {selectedMembers.map((member) => (
+                      <li key={member._id} className="flex items-center gap-3 px-4 py-2.5">
+                        <Avatar src={member.avatarUrl} name={member.name} size="xs" />
+                        <span className="min-w-0 flex-1 truncate text-sm text-foreground">{member.name}</span>
+                        <Money paise={shareByUser.get(String(member._id)) ?? 0} tone="default" className="text-sm" />
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="px-4 py-3 text-xs text-muted">Add an amount above to preview each person&rsquo;s share.</p>
+                )}
+
+                {preview && (
+                  <p className="border-t border-border bg-surface-muted/30 px-4 py-2 text-2xs text-muted">
+                    Split with the same rule the server applies, so the paise match when you save.
+                  </p>
+                )}
+              </div>
             </div>
           )}
         </div>
       </SectionCard>
 
-      <div className="flex flex-wrap items-center justify-end gap-2">
+      <div className="card-solid flex flex-col-reverse gap-2 p-3 sm:flex-row sm:items-center sm:justify-end sm:p-4">
         {onCancel && (
-          <Button type="button" variant="outline" onClick={onCancel} disabled={submitting}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+            disabled={submitting}
+            className="w-full sm:w-auto"
+          >
             Cancel
           </Button>
         )}
-        <Button type="submit" icon={Receipt} loading={submitting}>
+        <Button type="submit" icon={Receipt} loading={submitting} className="w-full sm:w-auto">
           {submitLabel || (mode === 'edit' ? 'Save changes' : 'Add expense')}
         </Button>
       </div>

@@ -20,7 +20,6 @@ import { formatRelativeTime } from '@/lib/format';
 import {
   Badge,
   Button,
-  Card,
   Checkbox,
   ConfirmDialog,
   DataTable,
@@ -259,7 +258,7 @@ export default function Settlements() {
   ];
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 page-stagger">
       <PageHeader
         title="Settlements"
         description="Money moving between housemates. A settlement only affects balances once the receiving person confirms it."
@@ -293,35 +292,36 @@ export default function Settlements() {
         <ErrorState error={error} onRetry={refetch} />
       ) : (
         <>
-          <Card padded={false} className="p-3">
-            <DataTable
-              columns={columns}
-              rows={items}
-              loading={loading}
-              emptyState={
-                <EmptyState
-                  icon={HandCoins}
-                  title={hasFilters ? 'No settlements match this view' : 'No settlements yet'}
-                  description={
-                    hasFilters
-                      ? 'Try a different status, or turn off "Only mine".'
-                      : 'A settlement records money moving between housemates. Balances only change once the receiving person confirms it.'
-                  }
-                  action={
-                    hasFilters ? (
-                      <Button variant="outline" size="sm" icon={RotateCcw} onClick={clearFilters}>
-                        Clear filters
-                      </Button>
-                    ) : (
-                      <Button size="sm" icon={HandCoins} onClick={() => setDialogOpen(true)}>
-                        Record settlement
-                      </Button>
-                    )
-                  }
-                />
-              }
-            />
-          </Card>
+          <DataTable
+            columns={columns}
+            rows={items}
+            loading={loading}
+            emptyState={
+              <EmptyState
+                icon={HandCoins}
+                title={hasFilters ? 'No settlements match this view' : 'No settlements yet'}
+                description={
+                  hasFilters
+                    ? 'Try a different status, or turn off "Only mine".'
+                    : 'A settlement records money moving between housemates. Balances only change once the receiving person confirms it.'
+                }
+                action={
+                  hasFilters ? (
+                    <Button variant="outline" size="sm" icon={RotateCcw} onClick={clearFilters}>
+                      Clear filters
+                    </Button>
+                  ) : (
+                    <Button size="sm" icon={HandCoins} onClick={() => setDialogOpen(true)}>
+                      Record settlement
+                    </Button>
+                  )
+                }
+              />
+            }
+            // No outer card on phones - the stacked rows already look like
+            // cards, and nesting them would double up the borders.
+            className="sm:rounded-xl sm:border sm:border-border sm:bg-surface sm:p-4 sm:shadow-card"
+          />
 
           <Pagination meta={meta} onChange={(next) => setParam('page', String(next))} itemLabel="settlement" />
         </>

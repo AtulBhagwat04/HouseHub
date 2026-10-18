@@ -16,8 +16,6 @@ export default function FormField({
   className,
   children,
 }) {
-  const describedBy = error ? `${htmlFor}-error` : hint ? `${htmlFor}-hint` : undefined;
-
   return (
     <div className={cn('flex flex-col gap-1.5', className)}>
       {label && (
@@ -34,7 +32,7 @@ export default function FormField({
       {children}
 
       {error ? (
-        <p id={`${htmlFor}-error`} role="alert" className="text-xs text-error">
+        <p id={`${htmlFor}-error`} role="alert" className="animate-fade-in text-xs text-error">
           {error}
         </p>
       ) : hint ? (
@@ -42,8 +40,6 @@ export default function FormField({
           {hint}
         </p>
       ) : null}
-
-      {describedBy ? null : null}
     </div>
   );
 }

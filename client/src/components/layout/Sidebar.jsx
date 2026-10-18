@@ -1,33 +1,35 @@
 import { NavLink } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/cn';
 import { useAuth } from '@/context/AuthContext';
 import { useNotifications } from '@/context/NotificationContext';
 import { NAV_SECTIONS } from './navItems';
+import { BrandMark } from './Brand';
 import XpBadge from '@/components/ui/XpBadge';
 import Avatar from '@/components/ui/Avatar';
+
+const spring = { type: 'spring', stiffness: 420, damping: 34 };
 
 /**
  * Desktop sidebar.
  *
  * Fixed width, own scroll region, and the user's XP card pinned to the bottom so
  * progress is ambient rather than something you have to go and look for.
+ *
+ * The active highlight is a Framer Motion `layoutId`, which makes the panel slide
+ * between destinations instead of blinking on and off as routes change.
  */
 export default function Sidebar() {
   const { user, house, isManager } = useAuth();
   const { unreadCount } = useNotifications();
 
   return (
-    <aside className="hidden w-64 shrink-0 flex-col border-r border-border bg-surface lg:flex">
-      <div className="flex h-16 items-center gap-2.5 border-b border-border px-5">
-        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-fg shadow-sm">
-          <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M3 10.5 12 3l9 7.5" />
-            <path d="M5 9.6V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.6" />
-          </svg>
-        </span>
+    <aside className="relative hidden w-[17rem] shrink-0 flex-col border-r border-border/70 bg-surface/50 backdrop-blur-xl lg:flex">
+      <div className="flex h-16 items-center gap-3 border-b border-border/70 px-5">
+        <BrandMark size="md" />
 
         <div className="min-w-0">
-          <p className="text-sm font-bold tracking-tight text-foreground">HOUSEHUB</p>
+          <p className="font-display text-sm font-extrabold tracking-tight text-foreground">HOUSEHUB</p>
           <p className="truncate text-2xs text-muted" title={house?.name}>
             {house?.name || 'No house yet'}
           </p>
@@ -41,7 +43,7 @@ export default function Sidebar() {
 
           return (
             <div key={section.label} className="mb-5">
-              <p className="mb-1.5 px-3 text-2xs font-semibold uppercase tracking-wider text-muted/80">
+              <p className="mb-1.5 px-3 text-2xs font-semibold uppercase tracking-[0.1em] text-muted/70">
                 {section.label}
               </p>
 
@@ -53,25 +55,31 @@ export default function Sidebar() {
                       end={item.end}
                       className={({ isActive }) =>
                         cn(
-                          'group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition',
+                          'group relative flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors',
                           isActive
-                            ? 'bg-primary-soft text-primary'
-                            : 'text-muted hover:bg-surface-muted hover:text-foreground',
+                            ? 'text-primary'
+                            : 'text-muted hover:bg-surface-muted/70 hover:text-foreground',
                         )
                       }
                     >
                       {({ isActive }) => (
                         <>
-                          <item.icon className="h-4.5 w-4.5 shrink-0" style={{ width: 18, height: 18 }} aria-hidden="true" />
-                          <span className="min-w-0 flex-1 truncate">{item.label}</span>
+                          {isActive && (
+                            <motion.span
+                              layoutId="sidebar-nav-pill"
+                              transition={spring}
+                              className="absolute inset-0 rounded-xl border border-primary/15 bg-primary-soft"
+                            />
+                          )}
+
+                          <item.icon className="relative h-[18px] w-[18px] shrink-0" aria-hidden="true" />
+                          <span className="relative min-w-0 flex-1 truncate">{item.label}</span>
 
                           {item.badge === 'unread' && unreadCount > 0 && (
-                            <span className="tabular flex h-5 min-w-5 items-center justify-center rounded-full bg-error px-1.5 text-2xs font-semibold text-white">
+                            <span className="tabular relative flex h-5 min-w-5 items-center justify-center rounded-full bg-error px-1.5 text-2xs font-semibold text-white">
                               {unreadCount > 99 ? '99+' : unreadCount}
                             </span>
                           )}
-
-                          {isActive && <span className="h-1.5 w-1.5 rounded-full bg-primary" />}
                         </>
                       )}
                     </NavLink>
@@ -83,20 +91,21 @@ export default function Sidebar() {
         })}
       </nav>
 
-      <div className="border-t border-border p-3">
+      <div className="border-t border-border/70 p-3">
         <NavLink
           to="/profile"
-          className="block rounded-xl p-2.5 transition hover:bg-surface-muted"
+          className="block rounded-2xl border border-transparent p-2.5 transition hover:border-border hover:bg-surface-muted/60"
         >
           <div className="flex items-center gap-2.5">
             <Avatar src={user?.avatarUrl} name={user?.name} size="md" />
+
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium text-foreground">{user?.name}</p>
               <p className="truncate text-xs text-muted">{house?.name || 'No house'}</p>
             </div>
           </div>
 
-          {user && <XpBadge xp={user.xp} level={user.level} className="mt-2.5" />}
+          {user && <XpBadge xp={user.xp} level={user.level} className="mt-3" />}
         </NavLink>
       </div>
     </aside>

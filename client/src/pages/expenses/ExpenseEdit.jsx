@@ -136,7 +136,7 @@ export default function ExpenseEdit() {
   if (!canEdit) return <ErrorState error={EDIT_BLOCKED} />;
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 page-stagger">
       <PageHeader
         title="Edit expense"
         description="Changes recalculate every affected balance."

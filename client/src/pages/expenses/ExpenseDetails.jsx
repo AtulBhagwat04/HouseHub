@@ -91,7 +91,7 @@ export default function ExpenseDetails() {
   const others = expense.participants.filter((participant) => idOf(participant.user) !== payerId);
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 page-stagger">
       <PageHeader
         title={expense.title}
         description={`Paid by ${payerName}`}
@@ -103,13 +103,7 @@ export default function ExpenseDetails() {
               <Button as={Link} to={`/expenses/${expense._id}/edit`} variant="outline" size="sm" icon={Pencil}>
                 Edit
               </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                icon={Trash2}
-                onClick={() => setConfirmOpen(true)}
-                className="text-error"
-              >
+              <Button variant="danger" size="sm" icon={Trash2} onClick={() => setConfirmOpen(true)}>
                 Delete
               </Button>
             </>
@@ -117,13 +111,20 @@ export default function ExpenseDetails() {
         }
       />
 
-      <Card>
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div className="min-w-0">
-            <p className="text-xs font-medium uppercase tracking-wide text-muted">Amount</p>
-            <p className="tabular mt-1 text-3xl font-semibold text-foreground">{formatCurrency(expense.amount)}</p>
+      <Card className="overflow-hidden">
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-12 -top-14 h-36 w-36 rounded-full bg-primary/15 blur-3xl"
+        />
 
-            <div className="mt-3 flex flex-wrap items-center gap-2">
+        <div className="relative flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
+            <p className="text-2xs font-semibold uppercase tracking-[0.08em] text-muted">Amount</p>
+            <p className="tabular mt-1.5 font-display text-4xl font-semibold leading-none text-foreground">
+              {formatCurrency(expense.amount)}
+            </p>
+
+            <div className="mt-4 flex flex-wrap items-center gap-2">
               <Badge tone="primary">
                 <span aria-hidden="true">{meta.emoji}</span>
                 {meta.label}
@@ -139,8 +140,8 @@ export default function ExpenseDetails() {
           </div>
 
           <div className="shrink-0 sm:text-right">
-            <p className="text-xs font-medium uppercase tracking-wide text-muted">Paid by</p>
-            <UserChip user={expense.paidBy} className="mt-1.5" />
+            <p className="text-2xs font-semibold uppercase tracking-[0.08em] text-muted">Paid by</p>
+            <UserChip user={expense.paidBy} className="mt-2" />
           </div>
         </div>
       </Card>
