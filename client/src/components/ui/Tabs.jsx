@@ -101,7 +101,7 @@ export default function Tabs({ tabs = [], value, onChange, className, variant = 
               <motion.span
                 layoutId={`${uid}-underline`}
                 transition={spring}
-                className="absolute inset-x-1 -bottom-px h-0.5 rounded-full bg-gradient-to-r from-primary to-secondary"
+                className="absolute inset-x-1 -bottom-px h-0.5 rounded-full bg-primary"
               />
             )}
           </button>

@@ -1,32 +1,27 @@
 import { cn } from '@/lib/cn';
 
 /**
- * Gradient fills per tone.
- *
- * `primary` reuses the shared `.bg-brand-gradient` class so the level bar, the
- * primary button and the hero accent are literally the same gradient.
+ * Clean progress fills per tone.
+ * Crisp, authentic colors without neon glow halos.
  */
 const TONES = {
-  primary: 'bg-brand-gradient',
-  success: 'bg-gradient-to-r from-emerald-500 to-teal-400',
-  warning: 'bg-gradient-to-r from-amber-500 to-orange-400',
-  error: 'bg-gradient-to-r from-red-500 to-rose-400',
-  gold: 'bg-gradient-to-r from-amber-400 to-yellow-300',
-  secondary: 'bg-gradient-to-r from-violet-500 to-fuchsia-400',
+  primary: 'bg-primary',
+  success: 'bg-emerald-500',
+  warning: 'bg-amber-500',
+  error: 'bg-rose-500',
+  gold: 'bg-amber-500',
+  secondary: 'bg-teal-500',
 };
 
 const SIZES = {
   xs: 'h-1',
   sm: 'h-1.5',
   md: 'h-2',
-  lg: 'h-3',
+  lg: 'h-2.5',
 };
 
 /**
- * Progress bar.
- *
- * `max` defaults to 1 so callers can pass a ready-made 0..1 ratio from the
- * shared XP helpers without re-deriving percentages in the UI.
+ * Progress bar primitive.
  */
 export default function ProgressBar({
   value = 0,
@@ -60,7 +55,7 @@ export default function ProgressBar({
       >
         <div
           className={cn(
-            'h-full rounded-full shadow-[0_0_12px_-2px_currentColor] transition-[width] duration-700 ease-out',
+            'h-full rounded-full transition-[width] duration-500 ease-out',
             TONES[tone] || TONES.primary,
           )}
           style={{ width: `${percent}%` }}

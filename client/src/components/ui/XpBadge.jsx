@@ -6,9 +6,7 @@ import { xpProgress } from '@/lib/catalogue';
 
 /**
  * Level + XP display.
- *
- * Two modes: a compact inline `level` chip (leaderboards, member lists) and a
- * full progress block with the bar to the next level (profile, dashboard).
+ * Clear, gamified but clean and grounded — no neon glow artifacts.
  */
 export default function XpBadge({ xp = 0, level, rank, variant = 'chip', className }) {
   const progress = xpProgress(xp);
@@ -33,22 +31,22 @@ export default function XpBadge({ xp = 0, level, rank, variant = 'chip', classNa
   }
 
   return (
-    <div className={cn('flex items-center gap-3.5', className)}>
-      <span className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-gold text-white shadow-glow-gold">
-        <Star className="h-5 w-5" aria-hidden="true" />
+    <div className={cn('flex items-center gap-3', className)}>
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-amber-500/25 bg-amber-500/10 text-amber-600 dark:text-amber-400">
+        <Star className="h-4 w-4" aria-hidden="true" />
       </span>
 
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline justify-between gap-2">
-          <p className="font-display text-sm font-semibold text-foreground">Level {resolvedLevel}</p>
+          <p className="font-display text-xs font-semibold text-foreground">Level {resolvedLevel}</p>
           <p className="tabular text-xs text-muted">
             {progress.xpIntoLevel} / {progress.xpForNextLevel} XP
           </p>
         </div>
 
-        <ProgressBar value={progress.progress} tone="gold" size="sm" className="mt-2" />
+        <ProgressBar value={progress.progress} tone="gold" size="sm" className="mt-1.5" />
 
-        <p className="mt-1.5 text-xs text-muted">
+        <p className="mt-1 text-2xs text-muted">
           {progress.xpToNextLevel} XP to level {resolvedLevel + 1}
         </p>
       </div>

@@ -228,7 +228,7 @@ function ChoreCard({ chore, completed, busy, onComplete }) {
         'relative overflow-hidden rounded-2xl border p-4 shadow-card transition',
         overdue
           ? 'border-error/40 bg-error-soft/40'
-          : 'border-border bg-surface hover:border-primary/40 hover:shadow-glow-gold',
+          : 'border-border bg-surface hover:border-border/80 hover:shadow-raised',
       )}
     >
       {overdue && <span aria-hidden="true" className="absolute inset-y-0 left-0 w-1 bg-error" />}

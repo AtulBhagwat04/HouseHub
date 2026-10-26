@@ -91,7 +91,7 @@ export default function Onboarding() {
           Welcome, {user?.name?.split(' ')[0] || 'housemate'}
         </h1>
         <p className="mt-1 text-sm text-muted">
-          HOUSEHUB works per house. Create one, or join the house your housemates already set up.
+          Create a new house or join your flatmates.
         </p>
       </div>
 
@@ -127,7 +127,7 @@ export default function Onboarding() {
                 setCreateError('');
               }}
               error={createErrors.name}
-              hint={!createErrors.name ? 'Something your housemates will recognise.' : undefined}
+              hint={!createErrors.name ? 'Your flat or apartment name.' : undefined}
               required
             />
 
@@ -137,7 +137,7 @@ export default function Onboarding() {
               placeholder="Koramangala, Bengaluru"
               value={createForm.location}
               onChange={(event) => setCreateForm((current) => ({ ...current, location: event.target.value }))}
-              hint="Optional. Helps if you have more than one place."
+              hint="Optional"
             />
 
             <Textarea
@@ -147,7 +147,7 @@ export default function Onboarding() {
               placeholder="Second floor, green gate, buzzer 4B"
               value={createForm.description}
               onChange={(event) => setCreateForm((current) => ({ ...current, description: event.target.value }))}
-              hint="Optional."
+              hint="Optional"
             />
 
             <Button type="submit" fullWidth size="lg" icon={Home} loading={creating}>
@@ -166,7 +166,7 @@ export default function Onboarding() {
                 setCodeError('');
               }}
               error={codeError}
-              hint={!codeError ? 'Paste the whole link if you have it - we will find the code.' : undefined}
+              hint={!codeError ? 'Paste the invite code or join link.' : undefined}
               required
             />
 
@@ -175,7 +175,7 @@ export default function Onboarding() {
             </Button>
 
             <p className="text-center text-xs text-muted">
-              Ask a housemate for the code, or open the invite link they sent you.
+              Ask a flatmate for the invite code or link.
             </p>
           </form>
         )}

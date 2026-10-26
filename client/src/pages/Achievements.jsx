@@ -205,29 +205,22 @@ function AchievementCard({ achievement }) {
       className={cn(
         'group relative flex flex-col overflow-hidden rounded-2xl border p-4 shadow-card transition sm:p-5',
         unlocked
-          ? 'border-gold/40 bg-gold/5 shadow-glow-gold hover:-translate-y-0.5'
+          ? 'border-amber-500/30 bg-amber-500/5 shadow-subtle hover:border-amber-500/50'
           : inProgress
-            ? 'border-border bg-surface hover:-translate-y-0.5 hover:border-primary/40'
+            ? 'border-border bg-surface hover:border-border/80'
             : // Not started: desaturated and dimmed so it cannot be mistaken
               // for something earned.
               'border-border bg-surface/60 opacity-70 saturate-50 hover:opacity-100 hover:saturate-100',
       )}
     >
-      {unlocked && (
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute -right-10 -top-14 h-32 w-32 rounded-full bg-gold/20 blur-2xl"
-        />
-      )}
-
-      <div className="relative flex items-start gap-3">
+      <div className="flex items-start gap-3">
         <span
           className={cn(
             'flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-xl',
             unlocked
-              ? 'bg-gradient-gold text-white shadow-glow-gold'
+              ? 'bg-amber-500 text-white shadow-subtle'
               : inProgress
-                ? 'bg-primary-soft'
+                ? 'bg-primary-soft text-primary'
                 : 'bg-surface-muted',
           )}
           aria-hidden="true"

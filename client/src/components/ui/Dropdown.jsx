@@ -38,8 +38,8 @@ export default function Dropdown({
           sideOffset={6}
           collisionPadding={8}
           className={cn(
-            'z-50 origin-top animate-pop-in overflow-hidden rounded-2xl border border-border p-1.5 shadow-pop',
-            'bg-surface-raised/95 backdrop-blur-xl',
+            'z-50 origin-top animate-pop-in overflow-hidden rounded-xl border border-border p-1 shadow-dropdown',
+            'bg-surface',
             width,
             panelClassName,
           )}

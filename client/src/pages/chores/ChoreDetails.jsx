@@ -326,14 +326,9 @@ export default function ChoreDetails() {
             </div>
           </SectionCard>
 
-          <Card className="relative overflow-hidden">
-            <span
-              aria-hidden="true"
-              className="pointer-events-none absolute -right-10 -top-14 h-40 w-40 rounded-full bg-gold/15 blur-3xl"
-            />
-
-            <div className="relative flex items-start gap-3.5">
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-gold text-white shadow-glow-gold">
+          <Card>
+            <div className="flex items-start gap-3.5">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white shadow-subtle">
                 <Zap className="h-5 w-5" aria-hidden="true" />
               </span>
 

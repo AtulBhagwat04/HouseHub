@@ -6,11 +6,8 @@ export default {
     extend: {
       /**
        * Semantic colour tokens driven by CSS variables (see src/index.css).
-       *
-       * Components say `bg-surface` or `text-muted`, never
-       * `bg-white dark:bg-slate-900`, so light/dark stays a one-file concern and
-       * an opacity modifier like `bg-primary/10` still works because the values
-       * are raw RGB channels rather than hex.
+       * Light and dark themes are designed for clarity, warmth, and human utility,
+       * avoiding generic AI tropes like neon glows and radioactive gradients.
        */
       colors: {
         background: 'rgb(var(--c-background) / <alpha-value>)',
@@ -43,12 +40,10 @@ export default {
           DEFAULT: 'rgb(var(--c-error) / <alpha-value>)',
           soft: 'rgb(var(--c-error-soft) / <alpha-value>)',
         },
-        /** Reserved for gamification, so the money screens stay sober. */
         gold: {
           DEFAULT: 'rgb(var(--c-gold) / <alpha-value>)',
           soft: 'rgb(var(--c-gold-soft) / <alpha-value>)',
         },
-        /** Gradient stop used by the primary button and hero accents. */
         accent: 'rgb(var(--c-accent) / <alpha-value>)',
       },
 
@@ -82,34 +77,32 @@ export default {
       borderRadius: {
         xl: '0.75rem',
         '2xl': '1rem',
-        '3xl': '1.375rem',
+        '3xl': '1.25rem',
       },
 
       boxShadow: {
-        card: '0 1px 2px 0 rgb(0 0 0 / 0.05), 0 1px 3px 0 rgb(0 0 0 / 0.06)',
-        raised: '0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07)',
-        pop: '0 18px 40px -12px rgb(0 0 0 / 0.38), 0 4px 12px -4px rgb(0 0 0 / 0.22)',
-        /** Colour glows - the main source of the "lit from within" dark look. */
-        glow: '0 0 0 1px rgb(var(--c-primary) / 0.25), 0 8px 30px -8px rgb(var(--c-primary) / 0.55)',
-        'glow-sm': '0 4px 16px -6px rgb(var(--c-primary) / 0.5)',
-        'glow-lg': '0 0 0 1px rgb(var(--c-primary) / 0.2), 0 18px 60px -12px rgb(var(--c-primary) / 0.6)',
-        'glow-gold': '0 0 0 1px rgb(var(--c-gold) / 0.25), 0 8px 26px -8px rgb(var(--c-gold) / 0.45)',
-        /** Hairline highlight along the top edge of a glass card. */
-        hairline: 'inset 0 1px 0 0 rgb(255 255 255 / 0.06)',
+        subtle: '0 1px 2px 0 rgb(0 0 0 / 0.04)',
+        card: '0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05)',
+        raised: '0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.05)',
+        dropdown: '0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04)',
+        pop: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.05)',
+        // Clean tactile button/tag shadows (no neon halos)
+        'glow-sm': '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+        glow: '0 2px 4px 0 rgb(0 0 0 / 0.06)',
+        'glow-lg': '0 4px 12px 0 rgb(0 0 0 / 0.08)',
+        'glow-gold': '0 2px 6px 0 rgb(217 119 6 / 0.15)',
+        hairline: 'inset 0 1px 0 0 rgb(255 255 255 / 0.08)',
       },
 
       backgroundImage: {
         'gradient-primary': 'linear-gradient(135deg, rgb(var(--c-primary)) 0%, rgb(var(--c-secondary)) 100%)',
         'gradient-primary-soft':
-          'linear-gradient(135deg, rgb(var(--c-primary) / 0.14) 0%, rgb(var(--c-secondary) / 0.14) 100%)',
-        'gradient-gold': 'linear-gradient(135deg, rgb(var(--c-gold)) 0%, rgb(var(--c-warning)) 100%)',
-        'gradient-aurora':
-          'radial-gradient(60% 60% at 15% 0%, rgb(var(--c-primary) / 0.28) 0%, transparent 60%), radial-gradient(50% 50% at 85% 10%, rgb(var(--c-secondary) / 0.22) 0%, transparent 55%)',
+          'linear-gradient(135deg, rgb(var(--c-primary) / 0.08) 0%, rgb(var(--c-secondary) / 0.08) 100%)',
+        'gradient-gold': 'linear-gradient(135deg, #d97706 0%, #b45309 100%)',
       },
 
       transitionTimingFunction: {
-        /** Slight overshoot - used for menus, tabs and dialogs. */
-        swift: 'cubic-bezier(0.34, 1.4, 0.64, 1)',
+        swift: 'cubic-bezier(0.16, 1, 0.3, 1)',
       },
 
       keyframes: {
@@ -118,55 +111,27 @@ export default {
           to: { opacity: '1' },
         },
         'slide-up': {
-          from: { opacity: '0', transform: 'translateY(8px)' },
+          from: { opacity: '0', transform: 'translateY(6px)' },
           to: { opacity: '1', transform: 'translateY(0)' },
         },
         'slide-in-right': {
-          from: { opacity: '0', transform: 'translateX(16px)' },
+          from: { opacity: '0', transform: 'translateX(12px)' },
           to: { opacity: '1', transform: 'translateX(0)' },
         },
         'pop-in': {
-          '0%': { opacity: '0', transform: 'scale(0.94)' },
-          '60%': { transform: 'scale(1.02)' },
+          '0%': { opacity: '0', transform: 'scale(0.96)' },
           '100%': { opacity: '1', transform: 'scale(1)' },
         },
         shimmer: {
           '100%': { transform: 'translateX(100%)' },
         },
-        /** Slow drift for the decorative background blobs. */
-        aurora: {
-          '0%, 100%': { transform: 'translate3d(0, 0, 0) scale(1)' },
-          '33%': { transform: 'translate3d(4%, -3%, 0) scale(1.06)' },
-          '66%': { transform: 'translate3d(-3%, 3%, 0) scale(0.97)' },
-        },
-        float: {
-          '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-6px)' },
-        },
-        'glow-pulse': {
-          '0%, 100%': { opacity: '0.55' },
-          '50%': { opacity: '1' },
-        },
-        'bar-grow': {
-          from: { transform: 'scaleX(0)' },
-          to: { transform: 'scaleX(1)' },
-        },
-        'marquee-x': {
-          from: { transform: 'translateX(0)' },
-          to: { transform: 'translateX(-50%)' },
-        },
       },
 
       animation: {
-        'fade-in': 'fade-in 180ms ease-out both',
-        'slide-up': 'slide-up 240ms cubic-bezier(0.22, 1, 0.36, 1) both',
-        'slide-in-right': 'slide-in-right 240ms cubic-bezier(0.22, 1, 0.36, 1) both',
-        'pop-in': 'pop-in 300ms cubic-bezier(0.34, 1.56, 0.64, 1) both',
-        aurora: 'aurora 24s ease-in-out infinite',
-        float: 'float 5s ease-in-out infinite',
-        'glow-pulse': 'glow-pulse 4s ease-in-out infinite',
-        'bar-grow': 'bar-grow 700ms cubic-bezier(0.22, 1, 0.36, 1) both',
-        'marquee-x': 'marquee-x 30s linear infinite',
+        'fade-in': 'fade-in 160ms ease-out both',
+        'slide-up': 'slide-up 200ms cubic-bezier(0.16, 1, 0.3, 1) both',
+        'slide-in-right': 'slide-in-right 200ms cubic-bezier(0.16, 1, 0.3, 1) both',
+        'pop-in': 'pop-in 200ms cubic-bezier(0.16, 1, 0.3, 1) both',
       },
     },
   },

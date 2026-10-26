@@ -105,8 +105,8 @@ export default function InviteCard({
       </div>
 
       <div className="relative mt-4 space-y-3">
-        <div className="flex items-center gap-2 rounded-2xl border border-primary/25 bg-primary-soft/50 py-2 pl-4 pr-2">
-          <span className="min-w-0 flex-1 truncate font-mono text-xl font-semibold tracking-[0.18em] text-primary tabular">
+        <div className="flex items-center gap-2 rounded-xl border border-border bg-surface-muted/50 py-2 pl-3.5 pr-1.5">
+          <span className="min-w-0 flex-1 truncate font-mono text-lg font-bold tracking-[0.16em] text-foreground tabular">
             {code || 'Unavailable'}
           </span>
 
