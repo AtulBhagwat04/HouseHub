@@ -45,7 +45,7 @@ export default function Modal({
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.18 }}
-                className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md"
+                className="fixed inset-0 z-50 bg-slate-950/50 backdrop-blur-sm"
               />
             </DialogPrimitive.Overlay>
 
@@ -62,12 +62,12 @@ export default function Modal({
                 }}
               >
                 <motion.div
-                  initial={{ opacity: 0, y: 28, scale: 0.97 }}
+                  initial={{ opacity: 0, y: 20, scale: 0.98 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 18, scale: 0.98 }}
-                  transition={{ type: 'spring', stiffness: 340, damping: 32, mass: 0.7 }}
+                  exit={{ opacity: 0, y: 14, scale: 0.98 }}
+                  transition={{ type: 'spring', stiffness: 380, damping: 34, mass: 0.6 }}
                   className={cn(
-                    'card relative w-full overflow-hidden rounded-b-none rounded-t-3xl border-border shadow-pop sm:rounded-3xl',
+                    'relative w-full overflow-hidden rounded-b-none rounded-t-2xl border border-border bg-surface shadow-pop sm:rounded-2xl',
                     SIZES[size] || SIZES.md,
                     className,
                   )}

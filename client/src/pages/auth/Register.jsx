@@ -101,7 +101,7 @@ export default function Register() {
           label="Full name"
           name="name"
           autoComplete="name"
-          placeholder="Atul Sharma"
+          placeholder="Atul Bhagwat"
           value={form.name}
           onChange={update('name')}
           error={fieldErrors.name}
@@ -113,7 +113,7 @@ export default function Register() {
           type="email"
           name="email"
           autoComplete="email"
-          placeholder="you@example.com"
+          placeholder="atul@roomly.com"
           value={form.email}
           onChange={update('email')}
           error={fieldErrors.email}

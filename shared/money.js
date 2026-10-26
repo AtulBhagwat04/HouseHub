@@ -1,12 +1,3 @@
-/**
- * Money maths for HOUSEHUB.
- *
- * EVERY monetary value in this application is an integer number of paise
- * (1 rupee = 100 paise). Rupees are a *presentation* concern only. This module
- * is the single source of truth for turning a rupee amount into fair integer
- * shares, and it is imported by both the Express server and the React client so
- * the number the user sees is always the number the server will store.
- */
 
 import { SPLIT_TYPES } from './constants.js';
 
@@ -49,14 +40,6 @@ export function formatPaise(paise, { withSymbol = true, decimals = 2 } = {}) {
   return `${negative ? '-' : ''}${symbol}${formatted}`;
 }
 
-/**
- * Split `totalPaise` into `count` integer parts whose sum is EXACTLY totalPaise.
- * The indivisible remainder is handed out one paise at a time, starting at
- * index 0. Callers sort participants deterministically first, so the same
- * expense always produces the same shares.
- *
- * Rs 100 / 3  ->  [3334, 3333, 3333]
- */
 export function distributeEvenly(totalPaise, count) {
   if (!Number.isInteger(count) || count <= 0) {
     throw new SplitError('At least one participant is required to split an expense');
@@ -92,11 +75,6 @@ export function sumShares(participants) {
   return participants.reduce((total, participant) => total + (Number(participant.share) || 0), 0);
 }
 
-/**
- * Equal split. Participants are sorted by user id before distributing the
- * remainder, so Rs 100 across three people always yields the same three shares
- * regardless of the order the client sent them in.
- */
 export function splitEqual(totalPaise, participants) {
   const list = normaliseParticipants(participants);
   const ordered = [...list].sort(byUserId);
@@ -127,10 +105,6 @@ export function splitCustom(totalPaise, participants) {
   return result;
 }
 
-/**
- * Percentage split using the largest-remainder method, so the parts still sum
- * to the total exactly even when the percentages produce fractions of a paise.
- */
 export function splitPercentage(totalPaise, participants) {
   const list = normaliseParticipants(participants);
   const percentTotal = list.reduce((total, participant) => total + Number(participant.percentage || 0), 0);
@@ -162,10 +136,6 @@ export function splitPercentage(totalPaise, participants) {
   return list.map((participant) => ({ user: participant.user, share: shareByUser.get(String(participant.user)) }));
 }
 
-/**
- * The one entry point the API uses. Validates the amount, dispatches to the
- * right splitter, and guarantees `sum(shares) === amountPaise` or throws.
- */
 export function splitExpense({ amountPaise, splitType = 'equal', participants }) {
   const amount = Number(amountPaise);
   if (!isNonNegativeInt(amount)) {
@@ -188,8 +158,6 @@ export function splitExpense({ amountPaise, splitType = 'equal', participants })
 
   const total = sumShares(shares);
   if (total !== amount) {
-    // Belt and braces: this should be unreachable, and if it ever fires we want
-    // a loud failure rather than silently corrupt books.
     throw new SplitError(
       `Internal split error: shares total ${formatPaise(total)} but the expense is ${formatPaise(amount)}`,
     );
@@ -197,12 +165,6 @@ export function splitExpense({ amountPaise, splitType = 'equal', participants })
   return shares;
 }
 
-/**
- * Net position per member: positive means the house owes them money.
- *
- * Built purely from (a) who fronted each expense and (b) confirmed settlements.
- * Pending or rejected settlements deliberately do NOT move the ledger.
- */
 export function computeNetPositions({ members, expenses = [], settlements = [] }) {
   const net = new Map();
   for (const member of members) net.set(String(member), 0);
@@ -233,22 +195,7 @@ export function computeNetPositions({ members, expenses = [], settlements = [] }
   return net;
 }
 
-/**
- * PAIRWISE LEDGER
- *
- * A signed matrix of who owes whom, built per counterparty (NOT netted down to
- * a single balance per person).
- *
- * The distinction matters for the dashboard. Product spec section 8 shows
- * "You Owe Rs 850" and "You Are Owed Rs 1,200" at the same time - which is only
- * possible with a pairwise view. Min-cash-flow collapses each member to one
- * number, so it answers "what is the least I can pay" rather than "what do I
- * actually owe each person". Both are useful; this one is what gets displayed.
- *
- * Returns Map<userId, Map<otherUserId, paise>> where a POSITIVE value means
- * `userId` owes `otherUserId`. The matrix is kept antisymmetric, so
- * ledger[a][b] === -ledger[b][a].
- */
+
 export function computePairwiseLedger({ members = [], expenses = [], settlements = [] }) {
   const ledger = new Map();
 
@@ -287,10 +234,7 @@ export function computePairwiseLedger({ members = [], expenses = [], settlements
   return ledger;
 }
 
-/**
- * Splits one member's pairwise row into the two figures the dashboard shows.
- * `netBalance` is always youAreOwedTotal - youOweTotal.
- */
+
 export function summarisePairwise(ledger, userId) {
   const row = ledger.get(String(userId)) || new Map();
 

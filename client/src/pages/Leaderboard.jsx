@@ -24,7 +24,7 @@ const MEDALS = {
   1: {
     plinth: 'bg-gradient-to-b from-gold/30 to-gold/5 border border-gold/40',
     text: 'text-gold',
-    ring: 'ring-2 ring-gold/70 shadow-glow-gold',
+    ring: 'ring-2 ring-amber-500/70',
     chip: 'bg-gold/20 text-gold ring-1 ring-gold/40',
   },
   2: {
@@ -226,7 +226,7 @@ function PodiumColumn({ entry, place }) {
 
         {place === 1 && (
           <span
-            className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-gradient-gold text-white shadow-glow-gold"
+            className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-white shadow-subtle"
             aria-hidden="true"
           >
             <Trophy className="h-3 w-3" />

@@ -453,7 +453,7 @@ export default function Chores() {
                 'transition-shadow',
                 row.derivedStatus === 'overdue'
                   ? 'bg-error-soft/40'
-                  : 'hover:shadow-glow-gold sm:hover:shadow-none',
+                  : 'hover:shadow-raised sm:hover:shadow-none',
               )
             }
             className="sm:rounded-2xl sm:border sm:border-border sm:bg-surface sm:p-4 sm:shadow-card"

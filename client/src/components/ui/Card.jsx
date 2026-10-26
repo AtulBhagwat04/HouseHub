@@ -1,15 +1,8 @@
 import { cn } from '@/lib/cn';
 
 /**
- * Surface primitives.
- *
- * `Card` is the plain container; `SectionCard` is the one used by almost every
- * page - a titled panel with an optional action on the right (usually a link or
- * "View all" button) so pages don't re-invent their own heading markup.
- *
- * The `card` class (see index.css) supplies the translucent surface and the
- * hairline highlight, so the glass treatment is defined once rather than
- * repeated in every component.
+ * Surface primitives — solid, tactile, dependable cards.
+ * No neon aurora or blurry glass highlights.
  */
 export function Card({ as: Component = 'div', padded = true, className, children, ...rest }) {
   return (
@@ -23,8 +16,8 @@ export function CardHeader({ title, description, action, className, children }) 
   return (
     <div className={cn('flex flex-wrap items-start justify-between gap-3', className)}>
       <div className="min-w-0">
-        {title && <h2 className="font-display text-base font-semibold text-foreground">{title}</h2>}
-        {description && <p className="mt-0.5 text-sm text-muted">{description}</p>}
+        {title && <h2 className="font-display text-sm font-semibold text-foreground sm:text-base">{title}</h2>}
+        {description && <p className="mt-0.5 text-xs text-muted sm:text-sm">{description}</p>}
         {children}
       </div>
       {action && <div className="shrink-0">{action}</div>}
@@ -52,71 +45,51 @@ export function CardFooter({ className, children }) {
 }
 
 /**
- * A single headline number - the shape used across the dashboard.
- *
- * The icon sits in a tinted tile and a soft radial glow bleeds out of the top
- * right corner, which is what stops a row of four stat cards from reading as a
- * spreadsheet.
+ * A clean, crisp metric card.
+ * High clarity, balanced typography, and tasteful icons — no neon glow blur blobs.
  */
 export function StatCard({ label, value, sub, icon: Icon, tone = 'default', className, valueClassName }) {
   const toneClasses = {
     default: 'text-foreground',
-    success: 'text-success',
-    error: 'text-error',
-    warning: 'text-warning',
+    success: 'text-emerald-600 dark:text-emerald-400',
+    error: 'text-rose-600 dark:text-rose-400',
+    warning: 'text-amber-600 dark:text-amber-400',
     primary: 'text-primary',
   };
 
   const iconTone = {
-    default: 'bg-primary-soft text-primary',
+    default: 'bg-surface-muted text-muted',
     primary: 'bg-primary-soft text-primary',
-    success: 'bg-success-soft text-success',
-    error: 'bg-error-soft text-error',
-    warning: 'bg-warning-soft text-warning',
-  }[tone];
-
-  const glowTone = {
-    default: 'bg-primary/20',
-    primary: 'bg-primary/20',
-    success: 'bg-success/20',
-    error: 'bg-error/20',
-    warning: 'bg-warning/20',
+    success: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+    error: 'bg-rose-500/10 text-rose-600 dark:text-rose-400',
+    warning: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
   }[tone];
 
   return (
-    <Card className={cn('group overflow-hidden', className)}>
-      <span
-        aria-hidden="true"
-        className={cn(
-          'pointer-events-none absolute -right-8 -top-10 h-24 w-24 rounded-full blur-2xl transition-opacity duration-500',
-          'opacity-60 group-hover:opacity-100',
-          glowTone,
-        )}
-      />
-
-      <div className="relative flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="truncate text-2xs font-semibold uppercase tracking-[0.08em] text-muted">{label}</p>
+    <Card className={cn('group transition-all hover:border-border/80', className)}>
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-xs font-medium text-muted">{label}</p>
           <p
             className={cn(
-              'tabular mt-2 font-display text-2xl font-semibold leading-none sm:text-[1.75rem]',
+              'tabular mt-1.5 font-display text-2xl font-bold tracking-tight text-foreground sm:text-[1.65rem]',
               toneClasses[tone],
               valueClassName,
             )}
           >
             {value}
           </p>
-          {sub && <p className="mt-1.5 truncate text-xs text-muted">{sub}</p>}
+          {sub && <p className="mt-1 truncate text-xs text-muted">{sub}</p>}
         </div>
 
         {Icon && (
           <span
             className={cn(
-              'flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl',
+              'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-border/60 transition-transform group-hover:scale-105',
               iconTone,
             )}
           >
-            <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
+            <Icon className="h-4 w-4" aria-hidden="true" />
           </span>
         )}
       </div>

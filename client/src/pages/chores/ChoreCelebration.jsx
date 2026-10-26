@@ -3,16 +3,8 @@ import { Button, Modal } from '@/components/ui';
 
 /**
  * Completion feedback, shared by the chore board, My chores and the detail page.
- *
- * The three screens receive the same completion payload, so keeping one copy
- * here is what stops the wording and the celebration drifting apart between
- * them. The dialog is dismissible and never blocks the refetch that follows.
  */
 
-/**
- * Turns a completion response into a toast and, when it is worth shouting
- * about, a celebration modal.
- */
 export function reportCompletion(result, toast, onCelebrate) {
   if (result.alreadyCompleted) {
     toast.info('This chore was already completed.');
@@ -48,32 +40,26 @@ export default function ChoreCelebration({ celebration, onClose }) {
     >
       <div className="space-y-3">
         {level && (
-          <div className="animate-pop-in relative flex items-center gap-3.5 overflow-hidden rounded-2xl border border-gold/40 bg-gold/10 p-3.5 shadow-glow-gold">
-            <span
-              aria-hidden="true"
-              className="animate-glow-pulse pointer-events-none absolute -right-8 -top-10 h-24 w-24 rounded-full bg-gold/30 blur-2xl"
-            />
-
-            <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-gold text-white shadow-glow-gold">
+          <div className="animate-pop-in relative flex items-center gap-3.5 overflow-hidden rounded-2xl border border-amber-500/30 bg-amber-500/10 p-3.5 shadow-subtle">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white shadow-subtle">
               <Trophy className="h-5 w-5" aria-hidden="true" />
             </span>
 
-            <p className="relative min-w-0 font-display text-sm font-semibold text-foreground">
+            <p className="min-w-0 font-display text-sm font-semibold text-foreground">
               You are now level {level}
             </p>
           </div>
         )}
 
         {achievements.map((entry) => {
-          // The API may send either the flat definition or `{ definition }`.
           const definition = entry.definition || entry;
 
           return (
             <div
               key={definition.code || definition.name}
-              className="animate-pop-in flex items-start gap-3.5 rounded-2xl border border-primary/25 bg-primary-soft/40 p-3.5 shadow-glow-sm"
+              className="animate-pop-in flex items-start gap-3.5 rounded-2xl border border-primary/20 bg-primary-soft/40 p-3.5 shadow-subtle"
             >
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-primary text-lg text-white shadow-glow-sm">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-base text-primary-fg shadow-subtle">
                 {definition.icon ? (
                   <span aria-hidden="true">{definition.icon}</span>
                 ) : (
